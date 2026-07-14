@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ניהול פידבק — שושי 💜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<style>
+  :root{--grad:linear-gradient(135deg,#667eea,#764ba2);--ink:#2d2a45;--muted:#8b87a3;--accent:#7c5cff;--bg:#f4f2fc}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Rubik',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  header{background:var(--grad);color:#fff;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  header h1{font-size:1.3rem;font-weight:900}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{border:none;background:rgba(255,255,255,.18);color:#fff;font:inherit;font-weight:500;padding:9px 18px;border-radius:99px;cursor:pointer}
+  .tab.on{background:#fff;color:var(--accent);font-weight:700}
+  main{max-width:860px;margin:24px auto;padding:0 16px 60px}
+  .card{background:#fff;border-radius:20px;padding:24px;box-shadow:0 8px 30px rgba(60,40,120,.08);margin-bottom:18px}
+  h2{font-size:1.15rem;margin-bottom:4px}
+  .sub{color:var(--muted);font-size:.88rem;margin-bottom:16px}
+  label{display:block;font-weight:500;margin:14px 0 6px;font-size:.93rem}
+  input,textarea,select{width:100%;border:2px solid #eceafd;border-radius:12px;padding:11px 13px;font:inherit;background:#faf9ff}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+  textarea{resize:vertical;min-height:80px}
+  .btn{border:none;border-radius:12px;padding:12px 22px;background:var(--grad);color:#fff;font:inherit;font-weight:700;cursor:pointer;margin-top:16px}
+  .btn.ghost{background:#f1eefe;color:var(--accent)}
+  .btn.small{padding:8px 14px;font-size:.85rem;margin-top:0}
+  .btn:disabled{opacity:.5}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .pill{display:inline-block;padding:4px 12px;border-radius:99px;font-size:.78rem;font-weight:700}
+  .pill.open{background:#e3f9ec;color:#177245}.pill.closed{background:#ffeef0;color:#a12735}
+  .qedit{border:1.5px solid #eceafd;border-radius:14px;padding:12px;margin-top:10px;background:#faf9ff}
+  .qedit .row{gap:8px;flex-wrap:nowrap}
+  .qedit select{width:auto;flex:none}
+  .qedit input{flex:1;min-width:120px}
+  .qedit .mini{border:none;background:#f1eefe;color:var(--accent);border-radius:8px;padding:8px 11px;cursor:pointer;font:inherit;flex:none}
+  .qedit textarea{margin-top:8px;min-height:64px}
+  .qedit .hint{color:var(--muted);font-size:.8rem;margin:8px 2px 0}
+  .resp{border:1.5px solid #eceafd;border-radius:16px;padding:16px;margin-top:12px}
+  .resp .who{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .resp .who img,.resp .who .noimg{width:40px;height:40px;border-radius:50%;object-fit:cover}
+  .resp .who .noimg{background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900}
+  .resp .who small{color:var(--muted);display:block}
+  .qa{margin:7px 0;font-size:.92rem}
+  .qa b{color:var(--accent);font-weight:500;display:block;font-size:.8rem}
+  .hidden{display:none!important}
+  .note{background:#fff7e6;border:1.5px solid #ffe3a3;border-radius:12px;padding:12px;font-size:.85rem;color:#8a6d1a;margin-top:12px;line-height:1.5}
+  .ok{background:#e3f9ec;border-color:#a9e8c4;color:#177245}
+  .toast{position:fixed;bottom:22px;right:50%;transform:translateX(50%);background:var(--ink);color:#fff;padding:12px 24px;border-radius:99px;opacity:0;transition:.3s;pointer-events:none;z-index:99}
+  .toast.show{opacity:1}
+  /* גייט */
+  #gate{position:fixed;inset:0;background:var(--grad);display:flex;align-items:center;justify-content:center;z-index:50}
+  #gate .card{width:min(360px,90vw);text-align:center}
+  /* הקרנה */
+  #proj{position:fixed;inset:0;background:#17142b;color:#fff;z-index:60;overflow:auto;padding:30px}
+  #proj .bar{display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:26px;flex-wrap:wrap}
+  #proj h2{color:#fff;font-size:2rem;text-align:center;margin-bottom:6px}
+  .chip{border:2px solid rgba(255,255,255,.35);background:transparent;color:#fff;font:inherit;padding:8px 18px;border-radius:99px;cursor:pointer}
+  .chip.on{background:#fff;color:#17142b;font-weight:700}
+  #proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;max-width:1400px;margin:0 auto}
+  #proj-grid.names{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  .pcard{background:rgba(255,255,255,.08);border-radius:18px;padding:20px;animation:fin .4s ease}
+  @keyframes fin{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+  .pcard .pname{font-weight:900;font-size:1.25rem;display:flex;align-items:center;gap:10px}
+  .pcard .pname img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+  .pcard .pans{margin-top:10px;font-size:1rem;line-height:1.5;opacity:.92}
+  .pcard img.gen{width:100%;border-radius:12px;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="card">
+    <h2>💜 שלום שושי</h2>
+    <p class="sub">הכניסי קוד כדי להיכנס לניהול</p>
+    <input type="password" id="gate-pass" placeholder="קוד כניסה" style="text-align:center">
+    <div class="note hidden" id="gate-err" style="background:#ffeef0;border-color:#ffc2c9;color:#a12735">קוד שגוי</div>
+    <button class="btn" id="gate-btn" style="width:100%">כניסה</button>
+  </div>
+</div>
+
+<header>
+  <h1>ניהול הפידבק 💜</h1>
+  <div class="tabs">
+    <button class="tab on" data-t="lesson">📝 השיעור</button>
+    <button class="tab" data-t="resps">💌 תגובות</button>
+    <button class="tab" data-t="projBtn">📽️ הקרנה</button>
+    <button class="tab" data-t="setts">⚙️ הגדרות</button>
+  </div>
+</header>
+
+<main>
+  <!-- טאב שיעור -->
+  <section id="t-lesson">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div><h2>השיעור הנוכחי</h2><p class="sub" style="margin:0">מה שהתלמידים רואים עכשיו בקישור</p></div>
+        <span class="pill" id="l-pill"></span>
+      </div>
+      <label>שם השיעור</label>
+      <input id="l-title">
+      <label>הנקודה המרכזית של השיעור 💡 (תופיע בתוצר של התלמידים)</label>
+      <input id="l-point" placeholder="למשל: חשוב להיות גאה ביהדות">
+      <label>השאלות — התלמידים עונים רק על מה שמדבר אליהם</label>
+      <div id="q-editor"></div>
+      <button class="btn ghost small" id="q-add" style="margin-top:10px">➕ הוספת שאלה</button>
+      <label>סגנון התמונה (לשלב ב', כשיופעל מפתח התמונות)</label>
+      <select id="l-style">
+        <option>קומיקס</option><option>פיקסאר</option><option>ציור בצבעי מים</option>
+        <option>איור מצויר</option><option>פוסטר קולנוע</option><option>פיקסל ארט</option>
+      </select>
+      <label>הנחיות לתמונה (הפרומפט)</label>
+      <textarea id="l-prompt"></textarea>
+      <div class="row">
+        <button class="btn" id="l-save">שמירת שינויים 💾</button>
+        <button class="btn ghost" id="l-toggle"></button>
+        <button class="btn ghost" id="l-new">➕ שיעור חדש (מעתיק את ההגדרות)</button>
+      </div>
+      <div class="note">💡 <b>שיעור חדש</b> מעתיק את השאלות והסגנון מהשיעור הנוכחי — משנים רק מה שרוצים, בלי להזין הכל מחדש.</div>
+    </div>
+  </section>
+
+  <!-- טאב תגובות -->
+  <section id="t-resps" class="hidden">
+    <div class="card">
+      <h2>💌 התגובות</h2>
+      <p class="sub">כל מה שהתלמידים כתבו</p>
+      <label>בחרי שיעור</label>
+      <select id="r-lesson"></select>
+      <div id="r-list"></div>
+    </div>
+  </section>
+
+  <!-- טאב הגדרות -->
+  <section id="t-setts" class="hidden">
+    <div class="card">
+      <h2>⚙️ הגדרות</h2>
+      <label>קוד כניסה לדף הזה</label>
+      <input id="s-pass">
+      <label>מפתח ליצירת תמונות AI</label>
+      <input id="s-key" placeholder="עדיין לא פעיל" disabled>
+      <div class="note">🎨 יצירת התמונות תופעל בשלב ב׳ — אחרי שתעבירי לחוה את פרטי האשראי ויהיה מפתח. בינתיים כל תלמיד מקבל כרטיס מעוצב אישי עם התשובות שלו — בחינם.</div>
+      <button class="btn" id="s-save">שמירה 💾</button>
+    </div>
+    <div class="card">
+      <h2>👥 תלמידים רשומים</h2>
+      <div id="s-students" class="sub" style="margin-top:10px"></div>
+    </div>
+  </section>
+</main>
+
+<!-- מצב הקרנה -->
+<div id="proj" class="hidden">
+  <div class="bar">
+    <button class="chip on" data-m="answers">תשובות</button>
+    <button class="chip" data-m="names">רק שמות</button>
+    <button class="chip" data-m="images">תמונות</button>
+    <button class="chip" id="proj-close">✖ יציאה</button>
+  </div>
+  <h2 id="proj-title"></h2>
+  <p style="text-align:center;opacity:.6;margin-bottom:24px" id="proj-count"></p>
+  <div id="proj-grid"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const C=window.APP_CONFIG;
+let db=null, lesson=null, settings=null, projMode='answers', projTimer=null;
+const $=id=>document.getElementById(id);
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
+
+async function init(){
+  if(!C||C.SUPABASE_URL.startsWith('PASTE')){document.body.innerHTML='<div style="padding:40px;text-align:center;font-family:Rubik">🔌 האתר עוד לא חובר — צריך למלא את config.js (ראי README)</div>';return}
+  db=supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);
+  const {data}=await db.from('shoshi_settings').select('*').eq('id',1).single();
+  settings=data;
+  if(sessionStorage.getItem('shoshi_in')==='1') unlock();
+}
+$('gate-btn').onclick=()=>{
+  if($('gate-pass').value===String(settings?.admin_pass??'770')){sessionStorage.setItem('shoshi_in','1');unlock()}
+  else $('gate-err').classList.remove('hidden');
+};
+$('gate-pass').addEventListener('keydown',e=>{if(e.key==='Enter')$('gate-btn').click()});
+
+async function unlock(){
+  $('gate').classList.add('hidden');
+  await loadLesson(); await loadLessonList(); loadStudents();
+  $('s-pass').value=settings?.admin_pass||'';
+}
+
+/* ---- עורך שאלות ---- */
+const DEFAULT_OPENERS=['קשור לחלומות שלי בעתיד','קשור לבחירות שאני צריך לעשות','קשור לחיי משפחה','קשור לבית','קשור לדברים פיזיים','קשור לרגשות שלי','אחר'];
+let qList=[];
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+function normQ(q){return typeof q==='string'?{type:'text',q}:{...q}}
+function renderQEditor(){
+  $('q-editor').innerHTML=qList.map((qo,i)=>`
+    <div class="qedit" data-i="${i}">
+      <div class="row">
+        <select class="qe-type">
+          <option value="text"${qo.type==='text'?' selected':''}>✍️ טקסט חופשי</option>
+          <option value="emoji"${qo.type==='emoji'?' selected':''}>😊 בחירת אימוג'י</option>
+          <option value="openers"${qo.type==='openers'?' selected':''}>💬 פתיחים לבחירה</option>
+        </select>
+        <input class="qe-q" value="${esc(qo.q)}" placeholder="נוסח השאלה">
+        <button class="mini qe-up" title="למעלה">↑</button>
+        <button class="mini qe-dn" title="למטה">↓</button>
+        <button class="mini qe-del" title="מחיקה">✖</button>
+      </div>
+      ${qo.type==='openers'?`<textarea class="qe-opts" placeholder="שורה לכל פתיח">${esc((qo.options||[]).join('\n'))}</textarea>`:''}
+      ${qo.type==='emoji'?`<p class="hint">✨ אוטומטי — המערכת מגרילה 3 אימוג'ים חדשים בכל שיעור, התלמיד בוחר אחד ומסביר בכמה מילים</p>`:''}
+    </div>`).join('');
+  document.querySelectorAll('.qedit').forEach(el=>{
+    const i=+el.dataset.i;
+    el.querySelector('.qe-type').onchange=e=>{
+      qList[i].type=e.target.value;
+      if(qList[i].type==='openers'&&!qList[i].options?.length)qList[i].options=[...DEFAULT_OPENERS];
+      renderQEditor();
+    };
+    el.querySelector('.qe-q').oninput=e=>qList[i].q=e.target.value;
+    el.querySelector('.qe-opts')?.addEventListener('input',e=>qList[i].options=e.target.value.split('\n').map(s=>s.trim()).filter(Boolean));
+    el.querySelector('.qe-del').onclick=()=>{qList.splice(i,1);renderQEditor()};
+    el.querySelector('.qe-up').onclick=()=>{if(i>0){[qList[i-1],qList[i]]=[qList[i],qList[i-1]];renderQEditor()}};
+    el.querySelector('.qe-dn').onclick=()=>{if(i<qList.length-1){[qList[i+1],qList[i]]=[qList[i],qList[i+1]];renderQEditor()}};
+  });
+}
+$('q-add').onclick=()=>{qList.push({type:'text',q:''});renderQEditor();$('q-editor').lastElementChild?.querySelector('.qe-q').focus()};
+
+/* ---- שיעור ---- */
+async function loadLesson(){
+  const {data}=await db.from('shoshi_lessons').select('*').order('created_at',{ascending:false}).limit(1);
+  lesson=data?.[0]||null;
+  if(!lesson)return;
+  $('l-title').value=lesson.title;
+  $('l-point').value=lesson.lesson_point||'';
+  qList=(lesson.questions||[]).map(normQ);
+  renderQEditor();
+  $('l-style').value=lesson.image_style||'קומיקס';
+  $('l-prompt').value=lesson.image_prompt||'';
+  paintPill();
+}
+function paintPill(){
+  $('l-pill').className='pill '+(lesson.is_open?'open':'closed');
+  $('l-pill').textContent=lesson.is_open?'פתוח לתלמידים ✅':'סגור 🔒';
+  $('l-toggle').textContent=lesson.is_open?'לסגור את השיעור 🔒':'לפתוח לתלמידים ✅';
+}
+function collectLesson(){
+  return {
+    title:$('l-title').value.trim()||'שיעור',
+    lesson_point:$('l-point').value.trim(),
+    questions:qList.filter(q=>q.q.trim()).map(q=>({type:q.type,q:q.q.trim(),...(q.type==='openers'?{options:q.options||[]}:{})})),
+    image_style:$('l-style').value,
+    image_prompt:$('l-prompt').value.trim(),
+  };
+}
+$('l-save').onclick=async()=>{
+  const {error}=await db.from('shoshi_lessons').update(collectLesson()).eq('id',lesson.id);
+  if(error)return toast('שגיאה: '+error.message);
+  toast('נשמר! 💜'); loadLessonList();
+};
+$('l-toggle').onclick=async()=>{
+  const {error}=await db.from('shoshi_lessons').update({is_open:!lesson.is_open}).eq('id',lesson.id);
+  if(error)return toast('שגיאה: '+error.message);
+  lesson.is_open=!lesson.is_open; paintPill();
+  toast(lesson.is_open?'השיעור פתוח לתלמידים ✅':'השיעור נסגר 🔒');
+};
+$('l-new').onclick=async()=>{
+  const title=prompt('שם השיעור החדש:','שיעור חדש'); if(title===null)return;
+  const copy={...collectLesson(),title:title||'שיעור חדש',is_open:true};
+  await db.from('shoshi_lessons').update({is_open:false}).eq('id',lesson.id); // סוגר את הקודם
+  const {data,error}=await db.from('shoshi_lessons').insert(copy).select().single();
+  if(error)return toast('שגיאה: '+error.message);
+  lesson=data; await loadLesson(); await loadLessonList();
+  toast('שיעור חדש נפתח! 🎉');
+};
+
+/* ---- תגובות ---- */
+async function loadLessonList(){
+  const {data}=await db.from('shoshi_lessons').select('id,title,created_at').order('created_at',{ascending:false});
+  $('r-lesson').innerHTML=(data||[]).map(l=>`<option value="${l.id}">${l.title} · ${new Date(l.created_at).toLocaleDateString('he-IL')}</option>`).join('');
+  if(data?.length)loadResponses(data[0].id);
+}
+$('r-lesson').onchange=e=>loadResponses(e.target.value);
+async function loadResponses(lid){
+  const {data}=await db.from('shoshi_responses').select('*,student:shoshi_students(photo_base64)').eq('lesson_id',lid).order('created_at',{ascending:false});
+  if(!data?.length){$('r-list').innerHTML='<p class="sub" style="margin-top:16px">עדיין אין תגובות לשיעור הזה 🌱</p>';return}
+  $('r-list').innerHTML=data.map(r=>`
+    <div class="resp">
+      <div class="who">
+        ${r.student?.photo_base64?`<img src="${r.student.photo_base64}">`:`<span class="noimg">${(r.student_name||'?')[0]}</span>`}
+        <div><b>${r.student_name||'ללא שם'}</b><small>${new Date(r.created_at).toLocaleString('he-IL')}</small></div>
+      </div>
+      ${(r.answers||[]).filter(a=>a.a||a.emoji).map(a=>`<div class="qa"><b>${a.q}</b>${a.emoji?a.emoji+' ':''}${a.a}</div>`).join('')}
+      ${r.image_url?`<img src="${r.image_url}" style="max-width:200px;border-radius:12px;margin-top:8px">`:''}
+    </div>`).join('');
+}
+
+/* ---- הקרנה ---- */
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  if(b.dataset.t==='projBtn')return openProj();
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');
+  ['t-lesson','t-resps','t-setts'].forEach(s=>$(s).classList.add('hidden'));
+  $('t-'+(b.dataset.t==='lesson'?'lesson':b.dataset.t==='resps'?'resps':'setts')).classList.remove('hidden');
+});
+function openProj(){
+  $('proj').classList.remove('hidden');
+  document.documentElement.requestFullscreen?.().catch(()=>{});
+  renderProj(); projTimer=setInterval(renderProj,8000);
+}
+$('proj-close').onclick=()=>{
+  $('proj').classList.add('hidden'); clearInterval(projTimer);
+  document.exitFullscreen?.().catch(()=>{});
+};
+document.querySelectorAll('#proj .chip[data-m]').forEach(c=>c.onclick=()=>{
+  document.querySelectorAll('#proj .chip[data-m]').forEach(x=>x.classList.remove('on'));
+  c.classList.add('on'); projMode=c.dataset.m; renderProj();
+});
+async function renderProj(){
+  const {data}=await db.from('shoshi_responses').select('*,student:shoshi_students(photo_base64)').eq('lesson_id',lesson.id).order('created_at');
+  $('proj-title').textContent=lesson.title;
+  $('proj-count').textContent=(data?.length||0)+' תלמידים שיתפו 💜';
+  $('proj-grid').className=projMode==='names'?'names':'';
+  $('proj-grid').innerHTML=(data||[]).map(r=>{
+    const av=r.student?.photo_base64?`<img src="${r.student.photo_base64}">`:'';
+    if(projMode==='names')return `<div class="pcard"><div class="pname">${av}${r.student_name}</div></div>`;
+    if(projMode==='images')return r.image_url?`<div class="pcard"><div class="pname">${r.student_name}</div><img class="gen" src="${r.image_url}"></div>`:'';
+    const best=(r.answers||[]).filter(a=>a.a).map(a=>(a.emoji?a.emoji+' ':'')+a.a).sort((a,b)=>b.length-a.length)[0]||'';
+    return `<div class="pcard"><div class="pname">${av}${r.student_name}</div><div class="pans">"${best.length>160?best.slice(0,158)+'…':best}"</div></div>`;
+  }).join('')||'<p style="opacity:.6;text-align:center;grid-column:1/-1">מחכים לתגובות... ✨</p>';
+}
+
+/* ---- הגדרות ---- */
+$('s-save').onclick=async()=>{
+  const p=$('s-pass').value.trim()||'770';
+  const {error}=await db.from('shoshi_settings').update({admin_pass:p}).eq('id',1);
+  if(error)return toast('שגיאה: '+error.message);
+  settings.admin_pass=p; toast('נשמר! 💜');
+};
+async function loadStudents(){
+  const {data}=await db.from('shoshi_students').select('name,created_at').order('created_at');
+  $('s-students').innerHTML=data?.length
+    ? data.map(s=>s.name).join(' · ')+`<br><br>סה"כ: ${data.length} תלמידים`
+    : 'עדיין אין נרשמים';
+}
+
+init();
+</script>
+</body>
+</html>

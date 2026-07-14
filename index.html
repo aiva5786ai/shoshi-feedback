@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הפידבק שלי ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<style>
+  :root{
+    --grad: linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);
+    --card:#ffffff; --ink:#2d2a45; --muted:#8b87a3; --accent:#7c5cff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Rubik',sans-serif; background:var(--grad); background-attachment:fixed;
+    min-height:100vh; color:var(--ink); display:flex; justify-content:center; padding:20px 14px 48px;
+  }
+  .wrap{width:100%;max-width:520px}
+  .bubble-top{text-align:center;color:#fff;margin:10px 0 22px}
+  .bubble-top h1{font-weight:900;font-size:1.9rem;text-shadow:0 2px 12px rgba(0,0,0,.18)}
+  .bubble-top p{opacity:.9;margin-top:4px;font-size:.95rem}
+  .card{
+    background:var(--card); border-radius:24px; padding:26px 22px;
+    box-shadow:0 18px 50px rgba(40,20,90,.25); animation:pop .35s ease;
+  }
+  @keyframes pop{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+  h2{font-size:1.25rem;font-weight:700;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:18px}
+  label{display:block;font-weight:500;margin:16px 0 6px;font-size:.95rem}
+  input[type=text], textarea{
+    width:100%;border:2px solid #eceafd;border-radius:14px;padding:12px 14px;
+    font:inherit;font-size:1rem;background:#faf9ff;transition:border .15s;
+  }
+  input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  textarea{min-height:74px;resize:vertical}
+  .qnum{
+    display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+    border-radius:50%;background:var(--grad);color:#fff;font-size:.8rem;font-weight:700;margin-left:8px;flex:none;
+  }
+  .qrow{display:flex;align-items:flex-start;margin:18px 0 6px}
+  .qrow span.txt{font-weight:500;line-height:1.35}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 8px}
+  .chip-e,.chip-o{border:2px solid #eceafd;background:#faf9ff;border-radius:99px;padding:8px 14px;font:inherit;font-size:.88rem;cursor:pointer;transition:.15s}
+  .chip-e{font-size:1.5rem;padding:5px 12px}
+  .chip-e.sel,.chip-o.sel{border-color:var(--accent);background:#f1eefe;font-weight:700}
+  .btn{
+    display:block;width:100%;border:none;border-radius:16px;padding:15px;margin-top:22px;
+    background:var(--grad); color:#fff;font:inherit;font-size:1.1rem;font-weight:700;cursor:pointer;
+    box-shadow:0 8px 22px rgba(118,75,162,.35); transition:transform .12s;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:#f1eefe;color:var(--accent);box-shadow:none;margin-top:12px}
+  .btn:disabled{opacity:.55;cursor:wait}
+  .photo-drop{
+    margin-top:8px;border:2px dashed #cfc6f5;border-radius:18px;padding:18px;text-align:center;
+    color:var(--muted);cursor:pointer;background:#faf9ff;
+  }
+  .photo-drop img{width:96px;height:96px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 8px;border:3px solid var(--accent)}
+  .hi{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .hi img,.hi .noimg{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid var(--accent)}
+  .hi .noimg{background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.3rem}
+  .hi small{display:block;color:var(--muted)}
+  .switch{color:var(--accent);font-size:.8rem;cursor:pointer;text-decoration:underline}
+  .center{text-align:center}
+  .big-emoji{font-size:3.2rem;margin:8px 0}
+  canvas#cardCanvas{width:100%;border-radius:18px;margin-top:16px;box-shadow:0 10px 30px rgba(40,20,90,.2)}
+  .note{
+    margin-top:14px;background:#fff7e6;border:1.5px solid #ffe3a3;border-radius:14px;
+    padding:12px 14px;font-size:.85rem;color:#8a6d1a;line-height:1.5;
+  }
+  .hidden{display:none!important}
+  .err{background:#ffeef0;border:1.5px solid #ffc2c9;color:#a12735;border-radius:14px;padding:12px;margin-top:14px;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bubble-top">
+    <h1>✨ הפידבק שלי</h1>
+    <p>רגע לעצור, לחשוב — ולקחת משהו הביתה</p>
+  </div>
+
+  <!-- מסך: לא מחובר / אין שיעור -->
+  <div class="card hidden center" id="scr-msg">
+    <div class="big-emoji" id="msg-emoji">🔌</div>
+    <h2 id="msg-title"></h2>
+    <p class="sub" id="msg-sub"></p>
+  </div>
+
+  <!-- מסך: הרשמה חד-פעמית -->
+  <div class="card hidden" id="scr-reg">
+    <h2>נעים להכיר! 👋</h2>
+    <p class="sub">נרשמים פעם אחת בלבד — מהפעם הבאה נזכור אותך</p>
+    <label>איך קוראים לך?</label>
+    <input type="text" id="reg-name" placeholder="שם מלא">
+    <label>תמונה שלך (לא חובה — בשביל התוצר האישי)</label>
+    <div class="photo-drop" id="photo-drop">
+      <img id="photo-preview" class="hidden">
+      <span id="photo-hint">📷 לחצו להוספת תמונה</span>
+    </div>
+    <input type="file" id="photo-input" accept="image/*" class="hidden">
+    <div class="err hidden" id="reg-err"></div>
+    <button class="btn" id="reg-btn">יאללה, מתחילים 🚀</button>
+  </div>
+
+  <!-- מסך: טופס פידבק -->
+  <div class="card hidden" id="scr-form">
+    <div class="hi">
+      <span id="hi-avatar"></span>
+      <div>
+        <strong id="hi-name"></strong>
+        <small id="hi-lesson"></small>
+        <span class="switch" id="switch-user">לא את/ה? החלפת משתמש</span>
+      </div>
+    </div>
+    <p class="sub" style="margin-bottom:4px">עונים רק על מה שמדבר אליכם — אפילו תשובה אחת שווה המון 🙂</p>
+    <div id="questions"></div>
+    <div class="err hidden" id="form-err"></div>
+    <button class="btn" id="send-btn">שולחים! 💌</button>
+  </div>
+
+  <!-- מסך: תודה + כרטיס -->
+  <div class="card hidden center" id="scr-done">
+    <div class="big-emoji">🎉</div>
+    <h2 id="done-title">איזה כיף, קיבלנו!</h2>
+    <p class="sub">הנה הכרטיס האישי שלך מהשיעור — אפשר לשמור ולשתף</p>
+    <canvas id="cardCanvas" width="1080" height="1350"></canvas>
+    <button class="btn" id="dl-btn">להורדת הכרטיס 📥</button>
+    <button class="btn ghost" id="again-btn">לעדכן את התשובות שלי ✏️</button>
+    <div class="note" id="ai-note">🎨 בקרוב: תמונת AI אישית שתיווצר במיוחד בשבילך מהפידבק שלך!</div>
+  </div>
+</div>
+
+<script>
+const C = window.APP_CONFIG;
+let db=null, student=null, lesson=null, existing=null, photoB64=null;
+
+const $=id=>document.getElementById(id);
+const screens=['scr-msg','scr-reg','scr-form','scr-done'];
+function show(id){screens.forEach(s=>$(s).classList.toggle('hidden',s!==id))}
+function msg(emoji,title,sub){$('msg-emoji').textContent=emoji;$('msg-title').textContent=title;$('msg-sub').textContent=sub;show('scr-msg')}
+
+async function init(){
+  if(!C||C.SUPABASE_URL.startsWith('PASTE')){msg('🔌','האתר עוד לא חובר','חוה צריכה להשלים את החיבור ב-config.js');return}
+  db = supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
+
+  const {data:lessons,error} = await db.from('shoshi_lessons').select('*').eq('is_open',true).order('created_at',{ascending:false}).limit(1);
+  if(error){msg('😵','משהו השתבש בחיבור',error.message);return}
+  if(!lessons?.length){msg('🌙','אין כרגע שיעור פתוח לפידבק','חכו שהשיעור הבא ייפתח 🙂');return}
+  lesson = lessons[0];
+
+  const sid = localStorage.getItem('student_id');
+  if(sid){
+    const {data} = await db.from('shoshi_students').select('*').eq('id',sid).maybeSingle();
+    if(data){student=data; return openForm()}
+    localStorage.removeItem('student_id');
+  }
+  show('scr-reg');
+}
+
+/* ---- הרשמה ---- */
+$('photo-drop').onclick=()=>$('photo-input').click();
+$('photo-input').onchange=e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const img=new Image(), rd=new FileReader();
+  rd.onload=()=>{img.onload=()=>{
+    const cv=document.createElement('canvas'),m=400,sc=Math.min(1,m/Math.max(img.width,img.height));
+    cv.width=img.width*sc; cv.height=img.height*sc;
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    photoB64=cv.toDataURL('image/jpeg',.8);
+    $('photo-preview').src=photoB64;$('photo-preview').classList.remove('hidden');
+    $('photo-hint').textContent='📷 להחלפה לחצו שוב';
+  };img.src=rd.result};
+  rd.readAsDataURL(f);
+};
+$('reg-btn').onclick=async()=>{
+  const name=$('reg-name').value.trim();
+  if(name.length<2){$('reg-err').textContent='כתבו שם 🙂';$('reg-err').classList.remove('hidden');return}
+  $('reg-btn').disabled=true;
+  const {data,error}=await db.from('shoshi_students').insert({name,photo_base64:photoB64}).select().single();
+  $('reg-btn').disabled=false;
+  if(error){$('reg-err').textContent='שגיאה: '+error.message;$('reg-err').classList.remove('hidden');return}
+  student=data; localStorage.setItem('student_id',data.id); openForm();
+};
+
+/* ---- טופס ---- */
+const EMOJIS=['💡','🔥','❤️','🌱','🕯️','🎯','🧭','⚡','🌊','🗝️','🌈','✨','🌻','⛰️','🎁','🕊️','🌟','💪','🤝','🏠','⏳','📖','🧩','🌍','☀️','🌙','💎','🚀','🧠','🙏'];
+function normQ(q){return typeof q==='string'?{type:'text',q}:q}
+function pick3(seed){
+  let h=Math.abs([...seed].reduce((a,c)=>(a*31+c.charCodeAt(0))|0,7));
+  const arr=[...EMOJIS],out=[];
+  for(let i=0;i<3;i++){h=(h*48271)%2147483647;out.push(arr.splice(h%arr.length,1)[0])}
+  return out;
+}
+async function openForm(){
+  $('hi-name').textContent='היי '+student.name+'!';
+  $('hi-lesson').textContent=lesson.title;
+  $('hi-avatar').innerHTML=student.photo_base64?`<img src="${student.photo_base64}">`:`<span class="noimg">${student.name[0]}</span>`;
+
+  const {data}=await db.from('shoshi_responses').select('*').eq('lesson_id',lesson.id).eq('student_id',student.id).maybeSingle();
+  existing=data||null;
+
+  const qs=(lesson.questions||[]).map(normQ);
+  $('questions').innerHTML=qs.map((qo,i)=>{
+    const prev=existing?.answers?.[i]||{};
+    let extra='',ph='כמה מילים ממך...';
+    if(qo.type==='emoji'){
+      ph='כמה מילים — למה דווקא זה?';
+      extra=`<div class="chips">${pick3(lesson.id+'-'+i).map(e=>
+        `<button type="button" class="chip-e${prev.emoji===e?' sel':''}" data-e="${e}">${e}</button>`).join('')}</div>`;
+    }
+    if(qo.type==='openers'){
+      ph='בחרו פתיח או כתבו משלכם...';
+      extra=`<div class="chips">${(qo.options||[]).map(o=>
+        `<button type="button" class="chip-o" data-o="${o}">${o}</button>`).join('')}</div>`;
+    }
+    return `<div class="qblock" data-i="${i}">
+      <div class="qrow"><span class="qnum">${i+1}</span><span class="txt">${qo.q}</span></div>
+      ${extra}
+      <textarea data-q="${i}" placeholder="${ph}">${prev.a||''}</textarea>
+    </div>`;
+  }).join('');
+
+  document.querySelectorAll('#questions .chip-e').forEach(b=>b.onclick=()=>{
+    b.closest('.qblock').querySelectorAll('.chip-e').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');
+    b.closest('.qblock').querySelector('textarea').focus();
+  });
+  document.querySelectorAll('#questions .chip-o').forEach(b=>b.onclick=()=>{
+    const block=b.closest('.qblock'),ta=block.querySelector('textarea');
+    block.querySelectorAll('.chip-o').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');
+    const opts=[...block.querySelectorAll('.chip-o')].map(x=>x.dataset.o);
+    let rest=ta.value;
+    opts.forEach(o=>{if(rest.startsWith(o+' — '))rest=rest.slice((o+' — ').length)});
+    ta.value=b.dataset.o==='אחר'?rest:b.dataset.o+' — '+rest;
+    ta.focus();
+  });
+  show('scr-form');
+}
+$('switch-user').onclick=()=>{localStorage.removeItem('student_id');student=null;photoB64=null;show('scr-reg')};
+
+$('send-btn').onclick=async()=>{
+  const qs=(lesson.questions||[]).map(normQ);
+  const answers=qs.map((qo,i)=>{
+    const block=document.querySelector(`.qblock[data-i="${i}"]`);
+    const ans={q:qo.q,a:block.querySelector('textarea').value.trim()};
+    const e=block.querySelector('.chip-e.sel');
+    if(e)ans.emoji=e.dataset.e;
+    return ans;
+  });
+  if(!answers.some(x=>x.a)){$('form-err').textContent='כתבו לפחות תשובה אחת 🙂';$('form-err').classList.remove('hidden');return}
+  $('form-err').classList.add('hidden');$('send-btn').disabled=true;
+  let error;
+  if(existing){({error}=await db.from('shoshi_responses').update({answers}).eq('id',existing.id))}
+  else{
+    const r=await db.from('shoshi_responses').insert({lesson_id:lesson.id,student_id:student.id,student_name:student.name,answers}).select().single();
+    error=r.error; existing=r.data;
+  }
+  $('send-btn').disabled=false;
+  if(error){$('form-err').textContent='שגיאה בשליחה: '+error.message;$('form-err').classList.remove('hidden');return}
+  drawCard(answers); show('scr-done'); window.scrollTo({top:0,behavior:'smooth'});
+};
+$('again-btn').onclick=()=>openForm();
+
+/* ---- כרטיס אישי (canvas) ---- */
+const PALETTES=[['#667eea','#764ba2','#f093fb'],['#0ba360','#3cba92','#a8e063'],['#ff9966','#ff5e62','#ffc371'],['#36d1dc','#5b86e5','#8ed6ff'],['#f857a6','#ff5858','#ffb199']];
+function drawCard(answers){
+  const cv=$('cardCanvas'),x=cv.getContext('2d'),W=cv.width,H=cv.height;
+  const pal=PALETTES[Math.abs([...lesson.id].reduce((a,c)=>a+c.charCodeAt(0),0))%PALETTES.length];
+  document.fonts.ready.then(()=>{
+    const g=x.createLinearGradient(0,0,W,H);
+    g.addColorStop(0,pal[0]);g.addColorStop(.5,pal[1]);g.addColorStop(1,pal[2]);
+    x.fillStyle=g;x.fillRect(0,0,W,H);
+    x.globalAlpha=.12;x.fillStyle='#fff';
+    [[130,150,180],[950,220,120],[880,1180,200],[160,1150,140]].forEach(([cx,cy,r])=>{x.beginPath();x.arc(cx,cy,r,0,7);x.fill()});
+    x.globalAlpha=1; x.textAlign='center'; x.direction='rtl';
+
+    let y=170;
+    if(student.photo_base64){
+      const im=new Image();
+      im.onload=()=>{
+        x.save();x.beginPath();x.arc(W/2,230,130,0,7);x.clip();
+        const s=Math.max(260/im.width,260/im.height);
+        x.drawImage(im,W/2-im.width*s/2,230-im.height*s/2,im.width*s,im.height*s);
+        x.restore();
+        x.lineWidth=10;x.strokeStyle='rgba(255,255,255,.9)';x.beginPath();x.arc(W/2,230,130,0,7);x.stroke();
+        rest(400);
+      };
+      im.src=student.photo_base64;
+    } else rest(y);
+
+    function rest(y0){
+      let y=y0;
+      x.fillStyle='#fff';x.font='900 76px Rubik';
+      x.fillText(student.name,W/2,y+40); y+=110;
+      x.font='500 42px Rubik';x.globalAlpha=.92;
+      x.fillText(lesson.title,W/2,y); y+=60; x.globalAlpha=1;
+
+      if(lesson.lesson_point){
+        x.font='700 46px Rubik';
+        const lines=wrap(x,'💡 '+lesson.lesson_point,W-200);
+        roundRect(x,90,y,W-180,lines.length*62+50,30,'rgba(255,255,255,.18)');
+        x.fillStyle='#fff';
+        lines.forEach((l,i)=>x.fillText(l,W/2,y+70+i*62));
+        y+=lines.length*62+90;
+      }
+      x.font='400 38px Rubik';
+      answers.filter(a=>a.a).slice(0,3).forEach(a=>{
+        let t=(a.emoji?a.emoji+' ':'')+a.a;
+        if(t.length>90)t=t.slice(0,88)+'…';
+        const lines=wrap(x,'"'+t+'"',W-260);
+        roundRect(x,120,y,W-240,lines.length*52+40,26,'rgba(255,255,255,.92)');
+        x.fillStyle='#2d2a45';
+        lines.forEach((l,i)=>x.fillText(l,W/2,y+58+i*52));
+        x.fillStyle='#fff'; y+=lines.length*52+70;
+      });
+      x.font='500 34px Rubik';x.globalAlpha=.85;
+      x.fillText('✨ '+new Date().toLocaleDateString('he-IL')+' • השיעור של שושי ✨',W/2,H-70);
+      x.globalAlpha=1;
+    }
+  });
+}
+function wrap(x,text,maxW){
+  const words=text.split(' '),lines=[];let cur='';
+  words.forEach(w=>{const t=cur?cur+' '+w:w; if(x.measureText(t).width>maxW&&cur){lines.push(cur);cur=w}else cur=t});
+  if(cur)lines.push(cur); return lines.slice(0,4);
+}
+function roundRect(x,rx,ry,w,h,r,fill){x.fillStyle=fill;x.beginPath();x.roundRect(rx,ry,w,h,r);x.fill()}
+
+$('dl-btn').onclick=()=>{
+  const a=document.createElement('a');
+  a.download='הפידבק-שלי.png'; a.href=$('cardCanvas').toDataURL('image/png'); a.click();
+};
+
+init();
+</script>
+</body>
+</html>
