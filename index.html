@@ -122,8 +122,10 @@
         <strong id="hi-name"></strong>
         <small id="hi-lesson"></small>
         <span class="switch" id="switch-user">לא את/ה? החלפת משתמש</span>
+        <span class="switch" id="change-photo" style="margin-right:10px">📷 החלפת תמונה</span>
       </div>
     </div>
+    <input type="file" id="photo-change" accept="image/*" class="hidden">
     <p class="sub" style="margin-bottom:4px">עונים רק על מה שמדבר אליכם — אפילו תשובה אחת שווה המון 🙂</p>
     <div id="questions"></div>
     <div class="err hidden" id="form-err"></div>
@@ -170,19 +172,35 @@ async function init(){
 }
 
 /* ---- הרשמה ---- */
-$('photo-drop').onclick=()=>$('photo-input').click();
-$('photo-input').onchange=e=>{
-  const f=e.target.files[0]; if(!f)return;
+function compressPhoto(f,cb){
   const img=new Image(), rd=new FileReader();
   rd.onload=()=>{img.onload=()=>{
     const cv=document.createElement('canvas'),m=400,sc=Math.min(1,m/Math.max(img.width,img.height));
     cv.width=img.width*sc; cv.height=img.height*sc;
     cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
-    photoB64=cv.toDataURL('image/jpeg',.8);
-    $('photo-preview').src=photoB64;$('photo-preview').classList.remove('hidden');
-    $('photo-hint').textContent='📷 להחלפה לחצו שוב';
+    cb(cv.toDataURL('image/jpeg',.8));
   };img.src=rd.result};
   rd.readAsDataURL(f);
+}
+$('photo-drop').onclick=()=>$('photo-input').click();
+$('photo-input').onchange=e=>{
+  const f=e.target.files[0]; if(!f)return;
+  compressPhoto(f,b64=>{
+    photoB64=b64;
+    $('photo-preview').src=photoB64;$('photo-preview').classList.remove('hidden');
+    $('photo-hint').textContent='📷 להחלפה לחצו שוב';
+  });
+};
+// החלפת תמונה למשתמש קיים — נשמרת לכל הפעמים הבאות
+$('change-photo').onclick=()=>$('photo-change').click();
+$('photo-change').onchange=e=>{
+  const f=e.target.files[0]; if(!f)return;
+  compressPhoto(f,async b64=>{
+    const {error}=await db.from('shoshi_students').update({photo_base64:b64}).eq('id',student.id);
+    if(error){alert('שגיאה בשמירת התמונה: '+error.message);return}
+    student.photo_base64=b64;
+    $('hi-avatar').innerHTML=`<img src="${b64}">`;
+  });
 };
 let foundMatch=null;
 const normName=s=>s.trim().replace(/\s+/g,' ');
