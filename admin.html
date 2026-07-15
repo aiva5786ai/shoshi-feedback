@@ -127,9 +127,10 @@
   <section id="t-resps" class="hidden">
     <div class="card">
       <h2>💌 התגובות</h2>
-      <p class="sub">כל מה שהתלמידים כתבו</p>
+      <p class="sub">כל שיעור נשמר בנפרד — בוחרים שיעור ורואים רק את התגובות שלו</p>
       <label>בחרי שיעור</label>
       <select id="r-lesson"></select>
+      <button class="btn ghost small" id="r-export" style="margin-top:12px">📥 הורדת קובץ אקסל של השיעור הזה</button>
       <div id="r-list"></div>
     </div>
   </section>
@@ -285,8 +286,10 @@ async function loadLessonList(){
   if(data?.length)loadResponses(data[0].id);
 }
 $('r-lesson').onchange=e=>loadResponses(e.target.value);
+let lastResponses=[];
 async function loadResponses(lid){
   const {data}=await db.from('shoshi_responses').select('*,student:shoshi_students(photo_base64)').eq('lesson_id',lid).order('created_at',{ascending:false});
+  lastResponses=data||[];
   if(!data?.length){$('r-list').innerHTML='<p class="sub" style="margin-top:16px">עדיין אין תגובות לשיעור הזה 🌱</p>';return}
   $('r-list').innerHTML=data.map(r=>`
     <div class="resp">
@@ -298,6 +301,21 @@ async function loadResponses(lid){
       ${r.image_url?`<img src="${r.image_url}" style="max-width:200px;border-radius:12px;margin-top:8px">`:''}
     </div>`).join('');
 }
+$('r-export').onclick=()=>{
+  if(!lastResponses.length)return toast('אין תגובות לייצא לשיעור הזה');
+  const title=$('r-lesson').selectedOptions[0]?.textContent||'שיעור';
+  const qs=[...new Set(lastResponses.flatMap(r=>(r.answers||[]).map(a=>a.q)))];
+  const cell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const rows=[['שם','תאריך',...qs].map(cell).join(',')];
+  lastResponses.forEach(r=>{
+    const byQ=Object.fromEntries((r.answers||[]).map(a=>[a.q,(a.emoji?a.emoji+' ':'')+(a.a||'')]));
+    rows.push([r.student_name,new Date(r.created_at).toLocaleString('he-IL'),...qs.map(q=>byQ[q]||'')].map(cell).join(','));
+  });
+  const blob=new Blob(['﻿'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='פידבק - '+title.replace(/[\\/:*?"<>|]/g,'-')+'.csv'; a.click();
+  toast('הקובץ ירד! 📥');
+};
 
 /* ---- הקרנה ---- */
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{

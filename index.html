@@ -89,18 +89,27 @@
     <p class="sub" id="msg-sub"></p>
   </div>
 
-  <!-- מסך: הרשמה חד-פעמית -->
+  <!-- מסך: הרשמה / זיהוי לפי שם -->
   <div class="card hidden" id="scr-reg">
-    <h2>נעים להכיר! 👋</h2>
-    <p class="sub">נרשמים פעם אחת בלבד — מהפעם הבאה נזכור אותך</p>
-    <label>איך קוראים לך?</label>
-    <input type="text" id="reg-name" placeholder="שם מלא">
-    <label>תמונה שלך (לא חובה — בשביל התוצר האישי)</label>
-    <div class="photo-drop" id="photo-drop">
-      <img id="photo-preview" class="hidden">
-      <span id="photo-hint">📷 לחצו להוספת תמונה</span>
+    <div id="reg-main">
+      <h2>נעים להכיר! 👋</h2>
+      <p class="sub">כותבים את השם פעם אחת — ומהפעם הבאה המערכת מזהה אתכם לפי אותו שם, מכל מכשיר</p>
+      <label>שם פרטי + שם משפחה</label>
+      <input type="text" id="reg-name" placeholder="למשל: מאשה רפרינצבה">
+      <label>תמונה שלך (לא חובה — בשביל התוצר האישי)</label>
+      <div class="photo-drop" id="photo-drop">
+        <img id="photo-preview" class="hidden">
+        <span id="photo-hint">📷 לחצו להוספת תמונה</span>
+      </div>
+      <input type="file" id="photo-input" accept="image/*" class="hidden">
     </div>
-    <input type="file" id="photo-input" accept="image/*" class="hidden">
+    <div id="reg-found" class="hidden center">
+      <div class="big-emoji">😃</div>
+      <h2>מצאנו אותך!</h2>
+      <p class="sub">היי <b id="found-name"></b> — זה את/ה?</p>
+      <button class="btn" id="found-yes">כן, זה אני ✅</button>
+      <button class="btn ghost" id="found-no">לא, אני מישהו אחר</button>
+    </div>
     <div class="err hidden" id="reg-err"></div>
     <button class="btn" id="reg-btn">יאללה, מתחילים 🚀</button>
   </div>
@@ -175,14 +184,38 @@ $('photo-input').onchange=e=>{
   };img.src=rd.result};
   rd.readAsDataURL(f);
 };
+let foundMatch=null;
+const normName=s=>s.trim().replace(/\s+/g,' ');
+function regErr(t){$('reg-err').textContent=t;$('reg-err').classList.remove('hidden')}
+function regReset(){$('reg-found').classList.add('hidden');$('reg-main').classList.remove('hidden');$('reg-btn').classList.remove('hidden')}
 $('reg-btn').onclick=async()=>{
-  const name=$('reg-name').value.trim();
-  if(name.length<2){$('reg-err').textContent='כתבו שם 🙂';$('reg-err').classList.remove('hidden');return}
+  const name=normName($('reg-name').value);
+  $('reg-err').classList.add('hidden');
+  if(name.length<2){regErr('כתבו שם 🙂');return}
+  if(name.split(' ').length<2&&!/[0-9._-]/.test(name)){
+    regErr('כדי שנזהה אתכם תמיד באותו אופן — כתבו שם פרטי + שם משפחה (או שם עם ספרות, למשל: דוד770)');return
+  }
   $('reg-btn').disabled=true;
+  // זיהוי לפי שם — אם השם כבר רשום, זה כנראה אותו תלמיד שחוזר ממכשיר אחר
+  const {data:matches}=await db.from('shoshi_students').select('*').ilike('name',name).limit(1);
+  if(matches?.length){
+    foundMatch=matches[0]; $('found-name').textContent=foundMatch.name;
+    $('reg-main').classList.add('hidden'); $('reg-btn').classList.add('hidden');
+    $('reg-found').classList.remove('hidden'); $('reg-btn').disabled=false;
+    return;
+  }
   const {data,error}=await db.from('shoshi_students').insert({name,photo_base64:photoB64}).select().single();
   $('reg-btn').disabled=false;
-  if(error){$('reg-err').textContent='שגיאה: '+error.message;$('reg-err').classList.remove('hidden');return}
+  if(error){regErr('שגיאה: '+error.message);return}
   student=data; localStorage.setItem('student_id',data.id); openForm();
+};
+$('found-yes').onclick=()=>{
+  student=foundMatch; localStorage.setItem('student_id',student.id);
+  regReset(); openForm();
+};
+$('found-no').onclick=()=>{
+  regReset();
+  regErr('כנראה יש כבר מישהו עם השם הזה — הוסיפו משהו מזהה, למשל שם משפחה או ספרות: שרה כהן 12');
 };
 
 /* ---- טופס ---- */
