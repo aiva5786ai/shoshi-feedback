@@ -114,6 +114,27 @@
       </select>
       <label>הנחיות לתמונה (הפרומפט)</label>
       <textarea id="l-prompt"></textarea>
+      <label>כמה תשובות חובה לפחות?</label>
+      <input id="l-min" type="number" min="1" max="9" value="3" style="width:110px">
+      <label>רקע הכרטיס האישי 🎨</label>
+      <div class="row">
+        <select id="l-bg" style="width:auto">
+          <option value="">אוטומטי (משתנה בכל שיעור)</option>
+          <option value="#667eea,#764ba2,#f093fb">סגול–ורוד</option>
+          <option value="#0ba360,#3cba92,#a8e063">ירוק</option>
+          <option value="#ff9966,#ff5e62,#ffc371">כתום</option>
+          <option value="#36d1dc,#5b86e5,#8ed6ff">תכלת</option>
+          <option value="#f857a6,#ff5858,#ffb199">ורוד–אדום</option>
+          <option value="custom">מותאם אישית…</option>
+        </select>
+        <span id="l-bg-custom" class="hidden">
+          <input type="color" id="bg1" value="#667eea" style="width:46px;height:38px;padding:2px">
+          <input type="color" id="bg2" value="#764ba2" style="width:46px;height:38px;padding:2px">
+          <input type="color" id="bg3" value="#f093fb" style="width:46px;height:38px;padding:2px">
+        </span>
+      </div>
+      <label>הטקסט בתחתית הכרטיס (מופיע ליד התאריך — כדאי ברוסית)</label>
+      <input id="l-ctext" placeholder="Урок Шоши">
       <div class="row">
         <button class="btn" id="l-save">שמירת שינויים 💾</button>
         <button class="btn ghost" id="l-toggle"></button>
@@ -156,9 +177,9 @@
 <!-- מצב הקרנה -->
 <div id="proj" class="hidden">
   <div class="bar">
-    <button class="chip on" data-m="answers">תשובות</button>
+    <button class="chip on" data-m="answers">תשובות בלי שמות</button>
     <button class="chip" data-m="names">רק שמות</button>
-    <button class="chip" data-m="images">תמונות</button>
+    <button class="chip" data-m="images">רק תמונות</button>
     <button class="chip" id="proj-close">✖ יציאה</button>
   </div>
   <h2 id="proj-title"></h2>
@@ -242,8 +263,20 @@ async function loadLesson(){
   renderQEditor();
   $('l-style').value=lesson.image_style||'קומיקס';
   $('l-prompt').value=lesson.image_prompt||'';
+  $('l-min').value=lesson.min_answers??3;
+  $('l-ctext').value=lesson.card_text||'';
+  const bg=lesson.card_bg||'';
+  const preset=[...$('l-bg').options].some(o=>o.value===bg);
+  if(preset){$('l-bg').value=bg}
+  else{
+    $('l-bg').value='custom';
+    const cs=bg.split(',').map(s=>s.trim());
+    if(cs[0])$('bg1').value=cs[0]; if(cs[1])$('bg2').value=cs[1]; if(cs[2])$('bg3').value=cs[2];
+  }
+  $('l-bg-custom').classList.toggle('hidden',$('l-bg').value!=='custom');
   paintPill();
 }
+$('l-bg').onchange=()=>$('l-bg-custom').classList.toggle('hidden',$('l-bg').value!=='custom');
 function paintPill(){
   $('l-pill').className='pill '+(lesson.is_open?'open':'closed');
   $('l-pill').textContent=lesson.is_open?'פתוח לתלמידים ✅':'סגור 🔒';
@@ -256,11 +289,25 @@ function collectLesson(){
     questions:qList.filter(q=>q.q.trim()).map(q=>({type:q.type,q:q.q.trim(),...(q.type==='openers'?{options:q.options||[]}:{})})),
     image_style:$('l-style').value,
     image_prompt:$('l-prompt').value.trim(),
+    min_answers:Math.max(1,+$('l-min').value||3),
+    card_bg:$('l-bg').value==='custom'?[$('bg1').value,$('bg2').value,$('bg3').value].join(','):$('l-bg').value,
+    card_text:$('l-ctext').value.trim(),
   };
 }
+// אם עמודות שלב-העדכון עוד לא קיימות ב-DB — שומר בלעדיהן במקום להיכשל
+async function saveLesson(fields){
+  let {error}=await db.from('shoshi_lessons').update(fields).eq('id',lesson.id);
+  if(error&&/column|schema/i.test(error.message)){
+    const {min_answers,card_bg,card_text,...old}=fields;
+    ({error}=await db.from('shoshi_lessons').update(old).eq('id',lesson.id));
+    if(!error)return 'partial';
+  }
+  return error||null;
+}
 $('l-save').onclick=async()=>{
-  const {error}=await db.from('shoshi_lessons').update(collectLesson()).eq('id',lesson.id);
-  if(error)return toast('שגיאה: '+error.message);
+  const r=await saveLesson(collectLesson());
+  if(r==='partial'){toast('נשמר חלקית — צריך להריץ את migration-2.sql ב-Supabase');return loadLessonList()}
+  if(r)return toast('שגיאה: '+r.message);
   toast('נשמר! 💜'); loadLessonList();
 };
 $('l-toggle').onclick=async()=>{
@@ -273,7 +320,11 @@ $('l-new').onclick=async()=>{
   const title=prompt('שם השיעור החדש:','שיעור חדש'); if(title===null)return;
   const copy={...collectLesson(),title:title||'שיעור חדש',is_open:true};
   await db.from('shoshi_lessons').update({is_open:false}).eq('id',lesson.id); // סוגר את הקודם
-  const {data,error}=await db.from('shoshi_lessons').insert(copy).select().single();
+  let {data,error}=await db.from('shoshi_lessons').insert(copy).select().single();
+  if(error&&/column|schema/i.test(error.message)){
+    const {min_answers,card_bg,card_text,...old}=copy;
+    ({data,error}=await db.from('shoshi_lessons').insert(old).select().single());
+  }
   if(error)return toast('שגיאה: '+error.message);
   lesson=data; await loadLesson(); await loadLessonList();
   toast('שיעור חדש נפתח! 🎉');
@@ -342,12 +393,13 @@ async function renderProj(){
   $('proj-title').textContent=lesson.title;
   $('proj-count').textContent=(data?.length||0)+' תלמידים שיתפו 💜';
   $('proj-grid').className=projMode==='names'?'names':'';
+  // בקשת שושי: אף פעם לא להציג שם ליד מה שכתב — או רק שמות, או רק תשובות, או רק תמונות
   $('proj-grid').innerHTML=(data||[]).map(r=>{
     const av=r.student?.photo_base64?`<img src="${r.student.photo_base64}">`:'';
     if(projMode==='names')return `<div class="pcard"><div class="pname">${av}${r.student_name}</div></div>`;
-    if(projMode==='images')return r.image_url?`<div class="pcard"><div class="pname">${r.student_name}</div><img class="gen" src="${r.image_url}"></div>`:'';
+    if(projMode==='images')return r.image_url?`<div class="pcard"><img class="gen" src="${r.image_url}"></div>`:'';
     const best=(r.answers||[]).filter(a=>a.a).map(a=>(a.emoji?a.emoji+' ':'')+a.a).sort((a,b)=>b.length-a.length)[0]||'';
-    return `<div class="pcard"><div class="pname">${av}${r.student_name}</div><div class="pans">"${best.length>160?best.slice(0,158)+'…':best}"</div></div>`;
+    return best?`<div class="pcard"><div class="pans">"${best.length>160?best.slice(0,158)+'…':best}"</div></div>`:'';
   }).join('')||'<p style="opacity:.6;text-align:center;grid-column:1/-1">מחכים לתגובות... ✨</p>';
 }
 

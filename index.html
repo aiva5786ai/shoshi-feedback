@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="ru" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>הפידבק שלי ✨</title>
+<title>Мой фидбек ✨</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -38,7 +38,7 @@
   textarea{min-height:74px;resize:vertical}
   .qnum{
     display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
-    border-radius:50%;background:var(--grad);color:#fff;font-size:.8rem;font-weight:700;margin-left:8px;flex:none;
+    border-radius:50%;background:var(--grad);color:#fff;font-size:.8rem;font-weight:700;margin-right:8px;flex:none;
   }
   .qrow{display:flex;align-items:flex-start;margin:18px 0 6px}
   .qrow span.txt{font-weight:500;line-height:1.35}
@@ -78,69 +78,69 @@
 <body>
 <div class="wrap">
   <div class="bubble-top">
-    <h1>✨ הפידבק שלי</h1>
-    <p>רגע לעצור, לחשוב — ולקחת משהו הביתה</p>
+    <h1>✨ Мой фидбек</h1>
+    <p>Минутка остановиться, подумать — и взять что-то с собой</p>
   </div>
 
-  <!-- מסך: לא מחובר / אין שיעור -->
+  <!-- экран: нет связи / нет урока -->
   <div class="card hidden center" id="scr-msg">
     <div class="big-emoji" id="msg-emoji">🔌</div>
     <h2 id="msg-title"></h2>
     <p class="sub" id="msg-sub"></p>
   </div>
 
-  <!-- מסך: הרשמה / זיהוי לפי שם -->
+  <!-- экран: регистрация / узнавание по имени -->
   <div class="card hidden" id="scr-reg">
     <div id="reg-main">
-      <h2>נעים להכיר! 👋</h2>
-      <p class="sub">כותבים את השם פעם אחת — ומהפעם הבאה המערכת מזהה אתכם לפי אותו שם, מכל מכשיר</p>
-      <label>שם פרטי + שם משפחה</label>
-      <input type="text" id="reg-name" placeholder="למשל: מאשה רפרינצבה">
-      <label>תמונה שלך (לא חובה — בשביל התוצר האישי)</label>
+      <h2>Приятно познакомиться! 👋</h2>
+      <p class="sub">Напишите имя один раз — и в следующий раз система узнает вас по этому имени, с любого устройства</p>
+      <label>Имя и фамилия</label>
+      <input type="text" id="reg-name" placeholder="Например: Маша Репринцева">
+      <label>Твоё фото (необязательно — для личной карточки)</label>
       <div class="photo-drop" id="photo-drop">
         <img id="photo-preview" class="hidden">
-        <span id="photo-hint">📷 לחצו להוספת תמונה</span>
+        <span id="photo-hint">📷 Нажмите, чтобы добавить фото</span>
       </div>
       <input type="file" id="photo-input" accept="image/*" class="hidden">
     </div>
     <div id="reg-found" class="hidden center">
       <div class="big-emoji">😃</div>
-      <h2>מצאנו אותך!</h2>
-      <p class="sub">היי <b id="found-name"></b> — זה את/ה?</p>
-      <button class="btn" id="found-yes">כן, זה אני ✅</button>
-      <button class="btn ghost" id="found-no">לא, אני מישהו אחר</button>
+      <h2>Мы тебя нашли!</h2>
+      <p class="sub">Привет, <b id="found-name"></b> — это ты?</p>
+      <button class="btn" id="found-yes">Да, это я ✅</button>
+      <button class="btn ghost" id="found-no">Нет, это не я</button>
     </div>
     <div class="err hidden" id="reg-err"></div>
-    <button class="btn" id="reg-btn">יאללה, מתחילים 🚀</button>
+    <button class="btn" id="reg-btn">Поехали! 🚀</button>
   </div>
 
-  <!-- מסך: טופס פידבק -->
+  <!-- экран: форма фидбека -->
   <div class="card hidden" id="scr-form">
     <div class="hi">
       <span id="hi-avatar"></span>
       <div>
         <strong id="hi-name"></strong>
         <small id="hi-lesson"></small>
-        <span class="switch" id="switch-user">לא את/ה? החלפת משתמש</span>
-        <span class="switch" id="change-photo" style="margin-right:10px">📷 החלפת תמונה</span>
+        <span class="switch" id="switch-user">Не ты? Сменить пользователя</span>
+        <span class="switch" id="change-photo" style="margin-left:10px">📷 Сменить фото</span>
       </div>
     </div>
     <input type="file" id="photo-change" accept="image/*" class="hidden">
-    <p class="sub" style="margin-bottom:4px">עונים רק על מה שמדבר אליכם — אפילו תשובה אחת שווה המון 🙂</p>
+    <p class="sub" style="margin-bottom:4px" id="form-hint"></p>
     <div id="questions"></div>
     <div class="err hidden" id="form-err"></div>
-    <button class="btn" id="send-btn">שולחים! 💌</button>
+    <button class="btn" id="send-btn">Отправить! 💌</button>
   </div>
 
-  <!-- מסך: תודה + כרטיס -->
+  <!-- экран: спасибо + карточка -->
   <div class="card hidden center" id="scr-done">
     <div class="big-emoji">🎉</div>
-    <h2 id="done-title">איזה כיף, קיבלנו!</h2>
-    <p class="sub">הנה הכרטיס האישי שלך מהשיעור — אפשר לשמור ולשתף</p>
+    <h2 id="done-title">Ура, получили!</h2>
+    <p class="sub">Вот твоя личная карточка с урока — можно сохранить и поделиться</p>
     <canvas id="cardCanvas" width="1080" height="1350"></canvas>
-    <button class="btn" id="dl-btn">להורדת הכרטיס 📥</button>
-    <button class="btn ghost" id="again-btn">לעדכן את התשובות שלי ✏️</button>
-    <div class="note" id="ai-note">🎨 בקרוב: תמונת AI אישית שתיווצר במיוחד בשבילך מהפידבק שלך!</div>
+    <button class="btn" id="dl-btn">Скачать карточку 📥</button>
+    <button class="btn ghost" id="again-btn">Изменить мои ответы ✏️</button>
+    <div class="note" id="ai-note">🎨 Скоро: личная AI-картинка, которая создаётся специально для тебя из твоего фидбека!</div>
   </div>
 </div>
 
@@ -153,13 +153,25 @@ const screens=['scr-msg','scr-reg','scr-form','scr-done'];
 function show(id){screens.forEach(s=>$(s).classList.toggle('hidden',s!==id))}
 function msg(emoji,title,sub){$('msg-emoji').textContent=emoji;$('msg-title').textContent=title;$('msg-sub').textContent=sub;show('scr-msg')}
 
+// склонение: 1 вопрос / 2 вопроса / 5 вопросов
+function qWord(n){
+  const m10=n%10,m100=n%100;
+  if(m10===1&&m100!==11)return 'вопрос';
+  if(m10>=2&&m10<=4&&(m100<12||m100>14))return 'вопроса';
+  return 'вопросов';
+}
+function minAnswers(){
+  const n=Math.max(1,lesson?.min_answers??3);
+  return Math.min(n,(lesson?.questions||[]).length||n);
+}
+
 async function init(){
-  if(!C||C.SUPABASE_URL.startsWith('PASTE')){msg('🔌','האתר עוד לא חובר','חוה צריכה להשלים את החיבור ב-config.js');return}
+  if(!C||C.SUPABASE_URL.startsWith('PASTE')){msg('🔌','Сайт ещё не подключён','Нужно заполнить config.js');return}
   db = supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
 
   const {data:lessons,error} = await db.from('shoshi_lessons').select('*').eq('is_open',true).order('created_at',{ascending:false}).limit(1);
-  if(error){msg('😵','משהו השתבש בחיבור',error.message);return}
-  if(!lessons?.length){msg('🌙','אין כרגע שיעור פתוח לפידבק','חכו שהשיעור הבא ייפתח 🙂');return}
+  if(error){msg('😵','Что-то пошло не так',error.message);return}
+  if(!lessons?.length){msg('🌙','Сейчас нет открытого урока','Загляните, когда откроется следующий 🙂');return}
   lesson = lessons[0];
 
   const sid = localStorage.getItem('student_id');
@@ -171,7 +183,7 @@ async function init(){
   show('scr-reg');
 }
 
-/* ---- הרשמה ---- */
+/* ---- регистрация ---- */
 function compressPhoto(f,cb){
   const img=new Image(), rd=new FileReader();
   rd.onload=()=>{img.onload=()=>{
@@ -188,16 +200,16 @@ $('photo-input').onchange=e=>{
   compressPhoto(f,b64=>{
     photoB64=b64;
     $('photo-preview').src=photoB64;$('photo-preview').classList.remove('hidden');
-    $('photo-hint').textContent='📷 להחלפה לחצו שוב';
+    $('photo-hint').textContent='📷 Нажмите ещё раз, чтобы заменить';
   });
 };
-// החלפת תמונה למשתמש קיים — נשמרת לכל הפעמים הבאות
+// смена фото для существующего пользователя — сохраняется на все следующие разы
 $('change-photo').onclick=()=>$('photo-change').click();
 $('photo-change').onchange=e=>{
   const f=e.target.files[0]; if(!f)return;
   compressPhoto(f,async b64=>{
     const {error}=await db.from('shoshi_students').update({photo_base64:b64}).eq('id',student.id);
-    if(error){alert('שגיאה בשמירת התמונה: '+error.message);return}
+    if(error){alert('Ошибка при сохранении фото: '+error.message);return}
     student.photo_base64=b64;
     $('hi-avatar').innerHTML=`<img src="${b64}">`;
   });
@@ -209,12 +221,12 @@ function regReset(){$('reg-found').classList.add('hidden');$('reg-main').classLi
 $('reg-btn').onclick=async()=>{
   const name=normName($('reg-name').value);
   $('reg-err').classList.add('hidden');
-  if(name.length<2){regErr('כתבו שם 🙂');return}
+  if(name.length<2){regErr('Напишите имя 🙂');return}
   if(name.split(' ').length<2&&!/[0-9._-]/.test(name)){
-    regErr('כדי שנזהה אתכם תמיד באותו אופן — כתבו שם פרטי + שם משפחה (או שם עם ספרות, למשל: דוד770)');return
+    regErr('Чтобы мы всегда узнавали вас одинаково — напишите имя и фамилию (или имя с цифрами, например: Маша770)');return
   }
   $('reg-btn').disabled=true;
-  // זיהוי לפי שם — אם השם כבר רשום, זה כנראה אותו תלמיד שחוזר ממכשיר אחר
+  // узнавание по имени — если имя уже есть, это скорее всего тот же ученик с другого устройства
   const {data:matches}=await db.from('shoshi_students').select('*').ilike('name',name).limit(1);
   if(matches?.length){
     foundMatch=matches[0]; $('found-name').textContent=foundMatch.name;
@@ -224,7 +236,7 @@ $('reg-btn').onclick=async()=>{
   }
   const {data,error}=await db.from('shoshi_students').insert({name,photo_base64:photoB64}).select().single();
   $('reg-btn').disabled=false;
-  if(error){regErr('שגיאה: '+error.message);return}
+  if(error){regErr('Ошибка: '+error.message);return}
   student=data; localStorage.setItem('student_id',data.id); openForm();
 };
 $('found-yes').onclick=()=>{
@@ -233,11 +245,12 @@ $('found-yes').onclick=()=>{
 };
 $('found-no').onclick=()=>{
   regReset();
-  regErr('כנראה יש כבר מישהו עם השם הזה — הוסיפו משהו מזהה, למשל שם משפחה או ספרות: שרה כהן 12');
+  regErr('Похоже, кто-то с таким именем уже есть — добавьте что-то своё, например фамилию или цифры: Маша К 12');
 };
 
-/* ---- טופס ---- */
+/* ---- форма ---- */
 const EMOJIS=['💡','🔥','❤️','🌱','🕯️','🎯','🧭','⚡','🌊','🗝️','🌈','✨','🌻','⛰️','🎁','🕊️','🌟','💪','🤝','🏠','⏳','📖','🧩','🌍','☀️','🌙','💎','🚀','🧠','🙏'];
+const OTHER_LABELS=['אחר','Другое','другое','Other'];
 function normQ(q){return typeof q==='string'?{type:'text',q}:q}
 function pick3(seed){
   let h=Math.abs([...seed].reduce((a,c)=>(a*31+c.charCodeAt(0))|0,7));
@@ -246,9 +259,13 @@ function pick3(seed){
   return out;
 }
 async function openForm(){
-  $('hi-name').textContent='היי '+student.name+'!';
+  $('hi-name').textContent='Привет, '+student.name+'!';
   $('hi-lesson').textContent=lesson.title;
   $('hi-avatar').innerHTML=student.photo_base64?`<img src="${student.photo_base64}">`:`<span class="noimg">${student.name[0]}</span>`;
+  const minA=minAnswers();
+  $('form-hint').textContent=minA>1
+    ? `Ответьте хотя бы на ${minA} ${qWord(minA)} — выбирайте то, что ближе всего вам 🙂`
+    : 'Отвечайте на то, что откликается — даже один ответ очень ценен 🙂';
 
   const {data}=await db.from('shoshi_responses').select('*').eq('lesson_id',lesson.id).eq('student_id',student.id).maybeSingle();
   existing=data||null;
@@ -256,14 +273,14 @@ async function openForm(){
   const qs=(lesson.questions||[]).map(normQ);
   $('questions').innerHTML=qs.map((qo,i)=>{
     const prev=existing?.answers?.[i]||{};
-    let extra='',ph='כמה מילים ממך...';
+    let extra='',ph='Пара слов от тебя...';
     if(qo.type==='emoji'){
-      ph='כמה מילים — למה דווקא זה?';
+      ph='Пара слов — почему именно это?';
       extra=`<div class="chips">${pick3(lesson.id+'-'+i).map(e=>
         `<button type="button" class="chip-e${prev.emoji===e?' sel':''}" data-e="${e}">${e}</button>`).join('')}</div>`;
     }
     if(qo.type==='openers'){
-      ph='בחרו פתיח או כתבו משלכם...';
+      ph='Выберите начало или напишите своё...';
       extra=`<div class="chips">${(qo.options||[]).map(o=>
         `<button type="button" class="chip-o" data-o="${o}">${o}</button>`).join('')}</div>`;
     }
@@ -286,7 +303,7 @@ async function openForm(){
     const opts=[...block.querySelectorAll('.chip-o')].map(x=>x.dataset.o);
     let rest=ta.value;
     opts.forEach(o=>{if(rest.startsWith(o+' — '))rest=rest.slice((o+' — ').length)});
-    ta.value=b.dataset.o==='אחר'?rest:b.dataset.o+' — '+rest;
+    ta.value=OTHER_LABELS.includes(b.dataset.o)?rest:b.dataset.o+' — '+rest;
     ta.focus();
   });
   show('scr-form');
@@ -302,7 +319,13 @@ $('send-btn').onclick=async()=>{
     if(e)ans.emoji=e.dataset.e;
     return ans;
   });
-  if(!answers.some(x=>x.a)){$('form-err').textContent='כתבו לפחות תשובה אחת 🙂';$('form-err').classList.remove('hidden');return}
+  const minA=minAnswers(), cnt=answers.filter(x=>x.a).length;
+  if(cnt<minA){
+    $('form-err').textContent=minA>1
+      ? `Пожалуйста, ответьте хотя бы на ${minA} ${qWord(minA)} 🙂 (пока ${cnt})`
+      : 'Напишите хотя бы один ответ 🙂';
+    $('form-err').classList.remove('hidden');return
+  }
   $('form-err').classList.add('hidden');$('send-btn').disabled=true;
   let error;
   if(existing){({error}=await db.from('shoshi_responses').update({answers}).eq('id',existing.id))}
@@ -311,23 +334,29 @@ $('send-btn').onclick=async()=>{
     error=r.error; existing=r.data;
   }
   $('send-btn').disabled=false;
-  if(error){$('form-err').textContent='שגיאה בשליחה: '+error.message;$('form-err').classList.remove('hidden');return}
+  if(error){$('form-err').textContent='Ошибка при отправке: '+error.message;$('form-err').classList.remove('hidden');return}
   drawCard(answers); show('scr-done'); window.scrollTo({top:0,behavior:'smooth'});
 };
 $('again-btn').onclick=()=>openForm();
 
-/* ---- כרטיס אישי (canvas) ---- */
+/* ---- личная карточка (canvas) ---- */
 const PALETTES=[['#667eea','#764ba2','#f093fb'],['#0ba360','#3cba92','#a8e063'],['#ff9966','#ff5e62','#ffc371'],['#36d1dc','#5b86e5','#8ed6ff'],['#f857a6','#ff5858','#ffb199']];
+function cardPalette(){
+  // фон карточки: Шоши может задать свой в админке (card_bg), иначе — по уроку
+  const custom=(lesson.card_bg||'').split(',').map(s=>s.trim()).filter(s=>/^#[0-9a-fA-F]{3,8}$/.test(s));
+  if(custom.length>=2)return [custom[0],custom[1]||custom[0],custom[2]||custom[1]];
+  return PALETTES[Math.abs([...lesson.id].reduce((a,c)=>a+c.charCodeAt(0),0))%PALETTES.length];
+}
 function drawCard(answers){
   const cv=$('cardCanvas'),x=cv.getContext('2d'),W=cv.width,H=cv.height;
-  const pal=PALETTES[Math.abs([...lesson.id].reduce((a,c)=>a+c.charCodeAt(0),0))%PALETTES.length];
+  const pal=cardPalette();
   document.fonts.ready.then(()=>{
     const g=x.createLinearGradient(0,0,W,H);
     g.addColorStop(0,pal[0]);g.addColorStop(.5,pal[1]);g.addColorStop(1,pal[2]);
     x.fillStyle=g;x.fillRect(0,0,W,H);
     x.globalAlpha=.12;x.fillStyle='#fff';
     [[130,150,180],[950,220,120],[880,1180,200],[160,1150,140]].forEach(([cx,cy,r])=>{x.beginPath();x.arc(cx,cy,r,0,7);x.fill()});
-    x.globalAlpha=1; x.textAlign='center'; x.direction='rtl';
+    x.globalAlpha=1; x.textAlign='center'; x.direction='ltr';
 
     let y=170;
     if(student.photo_base64){
@@ -369,7 +398,8 @@ function drawCard(answers){
         x.fillStyle='#fff'; y+=lines.length*52+70;
       });
       x.font='500 34px Rubik';x.globalAlpha=.85;
-      x.fillText('✨ '+new Date().toLocaleDateString('he-IL')+' • השיעור של שושי ✨',W/2,H-70);
+      const footer=(lesson.card_text||'').trim()||'Урок Шоши';
+      x.fillText('✨ '+new Date().toLocaleDateString('ru-RU')+' • '+footer+' ✨',W/2,H-70);
       x.globalAlpha=1;
     }
   });
@@ -383,7 +413,7 @@ function roundRect(x,rx,ry,w,h,r,fill){x.fillStyle=fill;x.beginPath();x.roundRec
 
 $('dl-btn').onclick=()=>{
   const a=document.createElement('a');
-  a.download='הפידבק-שלי.png'; a.href=$('cardCanvas').toDataURL('image/png'); a.click();
+  a.download='мой-фидбек.png'; a.href=$('cardCanvas').toDataURL('image/png'); a.click();
 };
 
 init();
