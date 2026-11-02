@@ -3,115 +3,173 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Мой фидбек ✨</title>
+<title>Мой фидбек</title>
+<meta name="theme-color" content="#F6F5FA">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
 <style>
   :root{
-    --grad: linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);
-    --card:#ffffff; --ink:#2d2a45; --muted:#8b87a3; --accent:#7c5cff;
+    --bg:#F6F5FA; --surface:#fff; --ink:#1B1A2A; --muted:#5E5C72; --line:#E4E2EC;
+    --accent:#4F46E5; --accent-hover:#4338CA; --accent-soft:#EEEEFD; --accent-line:#C7C4F5;
+    --danger:#B42318; --danger-soft:#FEF3F2; --danger-line:#FECDCA;
+    --ok:#127A4B; --ok-soft:#E6F6EE;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
-    font-family:'Rubik',sans-serif; background:var(--grad); background-attachment:fixed;
-    min-height:100vh; color:var(--ink); display:flex; justify-content:center; padding:20px 14px 48px;
+    font-family:'Onest',system-ui,sans-serif; background:var(--bg); color:var(--ink);
+    min-height:100vh; display:flex; justify-content:center; padding:20px 16px 56px;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
   }
-  .wrap{width:100%;max-width:520px}
-  .bubble-top{text-align:center;color:#fff;margin:10px 0 22px}
-  .bubble-top h1{font-weight:900;font-size:1.9rem;text-shadow:0 2px 12px rgba(0,0,0,.18)}
-  .bubble-top p{opacity:.9;margin-top:4px;font-size:.95rem}
+  .wrap{width:100%;max-width:560px}
+  svg.ic{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-.2em}
+
+  .top{display:flex;align-items:center;gap:12px;margin:4px 2px 20px}
+  .logo{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex:none}
+  .top h1{font-size:1.25rem;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+  .top p{color:var(--muted);font-size:.875rem;margin-top:2px}
+
   .card{
-    background:var(--card); border-radius:24px; padding:26px 22px;
-    box-shadow:0 18px 50px rgba(40,20,90,.25); animation:pop .35s ease;
+    background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:24px 20px;
+    box-shadow:0 1px 2px rgba(27,26,42,.04),0 8px 24px rgba(27,26,42,.05); animation:rise .25s ease;
   }
-  @keyframes pop{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
-  h2{font-size:1.25rem;font-weight:700;margin-bottom:6px}
-  .sub{color:var(--muted);font-size:.9rem;margin-bottom:18px}
-  label{display:block;font-weight:500;margin:16px 0 6px;font-size:.95rem}
-  input[type=text], textarea{
-    width:100%;border:2px solid #eceafd;border-radius:14px;padding:12px 14px;
-    font:inherit;font-size:1rem;background:#faf9ff;transition:border .15s;
+  @keyframes rise{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+  h2{font-size:1.25rem;font-weight:700;letter-spacing:-.01em;margin-bottom:6px;line-height:1.3}
+  .sub{color:var(--muted);font-size:.9375rem;margin-bottom:18px}
+  label{display:block;font-weight:600;margin:18px 0 6px;font-size:.9375rem}
+  label small{font-weight:400;color:var(--muted);font-size:.875rem}
+  input[type=text],textarea{
+    width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+    font:inherit;font-size:1rem;color:var(--ink);background:#fff;transition:border-color .15s,box-shadow .15s;
   }
-  input:focus,textarea:focus{outline:none;border-color:var(--accent)}
-  textarea{min-height:74px;resize:vertical}
-  .qnum{
-    display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
-    border-radius:50%;background:var(--grad);color:#fff;font-size:.8rem;font-weight:700;margin-right:8px;flex:none;
-  }
-  .qrow{display:flex;align-items:flex-start;margin:18px 0 6px}
-  .qrow span.txt{font-weight:500;line-height:1.35}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 8px}
-  .chip-e,.chip-o{border:2px solid #eceafd;background:#faf9ff;border-radius:99px;padding:8px 14px;font:inherit;font-size:.88rem;cursor:pointer;transition:.15s}
-  .chip-e{font-size:1.5rem;padding:5px 12px}
-  .chip-e.sel,.chip-o.sel{border-color:var(--accent);background:#f1eefe;font-weight:700}
+  input[type=text]::placeholder,textarea::placeholder{color:#7A788E}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.15)}
+  textarea{min-height:84px;resize:vertical;margin-top:10px}
+  button{font:inherit;color:inherit;cursor:pointer}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
   .btn{
-    display:block;width:100%;border:none;border-radius:16px;padding:15px;margin-top:22px;
-    background:var(--grad); color:#fff;font:inherit;font-size:1.1rem;font-weight:700;cursor:pointer;
-    box-shadow:0 8px 22px rgba(118,75,162,.35); transition:transform .12s;
+    display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;
+    border:1px solid transparent;border-radius:12px;padding:12px 16px;margin-top:20px;
+    background:var(--accent);color:#fff;font-size:1rem;font-weight:600;transition:background-color .15s,border-color .15s;
   }
-  .btn:active{transform:scale(.97)}
-  .btn.ghost{background:#f1eefe;color:var(--accent);box-shadow:none;margin-top:12px}
-  .btn:disabled{opacity:.55;cursor:wait}
+  .btn:hover{background:var(--accent-hover)}
+  .btn.ghost{background:#fff;color:var(--ink);border-color:var(--line);margin-top:10px}
+  .btn.ghost:hover{background:var(--bg)}
+  .btn:disabled{opacity:.6;cursor:wait}
+  .link{background:none;border:none;color:var(--accent);font-size:.875rem;font-weight:500;padding:4px 0;min-height:32px;text-align:start}
+  .link:hover{text-decoration:underline}
+
   .photo-drop{
-    margin-top:8px;border:2px dashed #cfc6f5;border-radius:18px;padding:18px;text-align:center;
-    color:var(--muted);cursor:pointer;background:#faf9ff;
+    display:flex;align-items:center;gap:14px;width:100%;margin-top:2px;text-align:start;
+    border:1px dashed var(--accent-line);border-radius:14px;padding:14px;background:#FBFBFE;transition:background-color .15s,border-color .15s;
   }
-  .photo-drop img{width:96px;height:96px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 8px;border:3px solid var(--accent)}
-  .hi{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-  .hi img,.hi .noimg{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid var(--accent)}
-  .hi .noimg{background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.3rem}
-  .hi small{display:block;color:var(--muted)}
-  .switch{color:var(--accent);font-size:.8rem;cursor:pointer;text-decoration:underline}
+  .photo-drop:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .photo-slot{width:56px;height:56px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex:none;overflow:hidden}
+  .photo-slot img{width:100%;height:100%;object-fit:cover}
+  .photo-drop b{display:block;font-weight:600;font-size:.9375rem}
+  .fine{color:var(--muted);font-size:.8125rem;margin-top:8px}
+
+  .hi{display:flex;align-items:center;gap:12px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+  .hi img,.hi .noimg{width:52px;height:52px;border-radius:50%;object-fit:cover;display:block}
+  .hi .noimg{background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.25rem}
+  .hi strong{display:block;font-weight:700;line-height:1.3}
+  .hi small{display:block;color:var(--muted);font-size:.875rem}
+  .hi .links{display:flex;flex-wrap:wrap;gap:0 14px}
+
+  .prog{margin:4px 0 6px}
+  .prog-text{font-size:.875rem;font-weight:600;color:var(--muted)}
+  .prog.full .prog-text{color:var(--ok)}
+  .bar{height:6px;border-radius:99px;background:var(--accent-soft);margin-top:6px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;background:var(--accent);transition:width .25s ease}
+  .prog.full .bar i{background:var(--ok)}
+
+  .qblock{border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;transition:border-color .2s}
+  .qblock.answered{border-color:var(--accent-line)}
+  .qrow{display:flex;align-items:flex-start;gap:10px}
+  .qnum{
+    display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;
+    background:var(--accent-soft);color:var(--accent);font-size:.8125rem;font-weight:700;flex:none;transition:background-color .2s,color .2s;
+  }
+  .qblock.answered .qnum{background:var(--accent);color:#fff}
+  .qrow .txt{font-weight:600;line-height:1.4;padding-top:2px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip-e,.chip-o{
+    border:1px solid var(--line);background:#fff;border-radius:99px;min-height:44px;padding:8px 14px;
+    font-size:.9375rem;transition:background-color .15s,border-color .15s;
+  }
+  .chip-e{font-size:1.4rem;line-height:1;padding:6px 14px}
+  .chip-e:hover,.chip-o:hover{background:var(--bg)}
+  .chip-e.sel,.chip-o.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600;box-shadow:inset 0 0 0 1px var(--accent)}
+
   .center{text-align:center}
-  .big-emoji{font-size:3.2rem;margin:8px 0}
-  canvas#cardCanvas{width:100%;border-radius:18px;margin-top:16px;box-shadow:0 10px 30px rgba(40,20,90,.2)}
-  .note{
-    margin-top:14px;background:#fff7e6;border:1.5px solid #ffe3a3;border-radius:14px;
-    padding:12px 14px;font-size:.85rem;color:#8a6d1a;line-height:1.5;
-  }
+  .state-ic{width:56px;height:56px;border-radius:50%;margin:4px auto 14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:var(--accent-soft);color:var(--accent)}
+  .state-ic.ok{background:var(--ok-soft);color:var(--ok)}
+  canvas#cardCanvas{width:100%;display:block;border-radius:14px;border:1px solid var(--line)}
+  .ai-wait{background:var(--accent-soft);border-radius:14px;padding:18px 16px;margin:4px 0 18px;color:#34308F;font-weight:500;font-size:.9375rem}
+  .spin{width:28px;height:28px;border:3px solid var(--accent-line);border-top-color:var(--accent);border-radius:50%;margin:0 auto 10px;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  #ai-img{width:100%;display:block;border-radius:14px;border:1px solid var(--line);margin-top:4px}
+  #ai-dl{margin:12px 0 22px}
+  .skel{height:14px;border-radius:7px;background:linear-gradient(90deg,#EFEEF5 25%,#F8F7FB 50%,#EFEEF5 75%);background-size:200% 100%;animation:sh 1.2s linear infinite;margin-top:12px}
+  @keyframes sh{to{background-position:-200% 0}}
   .hidden{display:none!important}
-  .err{background:#ffeef0;border:1.5px solid #ffc2c9;color:#a12735;border-radius:14px;padding:12px;margin-top:14px;font-size:.9rem}
+  .err{background:var(--danger-soft);border:1px solid var(--danger-line);color:var(--danger);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:.9375rem}
+  @media (min-width:600px){body{padding-top:40px}.card{padding:30px 28px}}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="bubble-top">
-    <h1>✨ Мой фидбек</h1>
-    <p>Минутка остановиться, подумать — и взять что-то с собой</p>
+  <header class="top">
+    <span class="logo" data-ic="sparkle"></span>
+    <div>
+      <h1>Мой фидбек</h1>
+      <p>Минутка остановиться, подумать и взять что-то с собой</p>
+    </div>
+  </header>
+
+  <!-- экран: загрузка -->
+  <div class="card" id="scr-load" aria-label="Загрузка">
+    <div class="skel" style="width:55%;height:20px;margin-top:0"></div>
+    <div class="skel" style="width:90%"></div>
+    <div class="skel" style="width:75%"></div>
+    <div class="skel" style="height:52px;border-radius:12px;margin-top:24px"></div>
   </div>
 
   <!-- экран: нет связи / нет урока -->
   <div class="card hidden center" id="scr-msg">
-    <div class="big-emoji" id="msg-emoji">🔌</div>
+    <div class="state-ic" id="msg-icon"></div>
     <h2 id="msg-title"></h2>
-    <p class="sub" id="msg-sub"></p>
+    <p class="sub" id="msg-sub" style="margin-bottom:4px"></p>
   </div>
 
   <!-- экран: регистрация / узнавание по имени -->
   <div class="card hidden" id="scr-reg">
     <div id="reg-main">
-      <h2>Приятно познакомиться! 👋</h2>
-      <p class="sub">Напишите имя один раз — и в следующий раз система узнает вас по этому имени, с любого устройства</p>
-      <label>Имя и фамилия</label>
-      <input type="text" id="reg-name" placeholder="Например: Маша Репринцева">
-      <label>Твоё фото (необязательно — для личной карточки)</label>
-      <div class="photo-drop" id="photo-drop">
-        <img id="photo-preview" class="hidden">
-        <span id="photo-hint">📷 Нажмите, чтобы добавить фото</span>
-      </div>
+      <h2>Приятно познакомиться</h2>
+      <p class="sub" style="margin-bottom:0">Напиши имя один раз, и в следующий раз система узнает тебя с любого устройства</p>
+      <label for="reg-name">Имя и фамилия</label>
+      <input type="text" id="reg-name" placeholder="Например: Маша Репринцева" autocomplete="name">
+      <label>Твоё фото <small>(необязательно)</small></label>
+      <button type="button" class="photo-drop" id="photo-drop">
+        <span class="photo-slot" id="photo-slot" data-ic="camera"></span>
+        <span><b id="photo-hint">Добавить фото</b><span class="sub" style="font-size:.875rem;margin:0">Из него получится твоя личная AI-картинка</span></span>
+      </button>
+      <p class="fine">Фото хранится в системе и передаётся сервису ИИ (OpenAI) только для создания картинки</p>
       <input type="file" id="photo-input" accept="image/*" class="hidden">
     </div>
     <div id="reg-found" class="hidden center">
-      <div class="big-emoji">😃</div>
-      <h2>Мы тебя нашли!</h2>
-      <p class="sub">Привет, <b id="found-name"></b> — это ты?</p>
-      <button class="btn" id="found-yes">Да, это я ✅</button>
+      <div class="state-ic" data-ic="user"></div>
+      <h2>Мы тебя нашли</h2>
+      <p class="sub">Привет, <b id="found-name"></b>! Это ты?</p>
+      <button class="btn" id="found-yes"><span data-ic="check"></span>Да, это я</button>
       <button class="btn ghost" id="found-no">Нет, это не я</button>
     </div>
     <div class="err hidden" id="reg-err"></div>
-    <button class="btn" id="reg-btn">Поехали! 🚀</button>
+    <button class="btn" id="reg-btn">Продолжить<span data-ic="arrow"></span></button>
   </div>
 
   <!-- экран: форма фидбека -->
@@ -121,26 +179,35 @@
       <div>
         <strong id="hi-name"></strong>
         <small id="hi-lesson"></small>
-        <span class="switch" id="switch-user">Не ты? Сменить пользователя</span>
-        <span class="switch" id="change-photo" style="margin-left:10px">📷 Сменить фото</span>
+        <span class="links">
+          <button class="link" id="change-photo">Сменить фото</button>
+          <button class="link" id="switch-user">Не ты? Сменить пользователя</button>
+        </span>
       </div>
     </div>
     <input type="file" id="photo-change" accept="image/*" class="hidden">
-    <p class="sub" style="margin-bottom:4px" id="form-hint"></p>
+    <p class="sub" style="margin-bottom:12px" id="form-hint"></p>
+    <div class="prog" id="prog">
+      <span class="prog-text" id="prog-text"></span>
+      <div class="bar"><i id="prog-bar"></i></div>
+    </div>
+    <button class="btn ghost hidden" id="see-img"><span data-ic="image"></span>Моя картинка с этого урока</button>
     <div id="questions"></div>
     <div class="err hidden" id="form-err"></div>
-    <button class="btn" id="send-btn">Отправить! 💌</button>
+    <button class="btn" id="send-btn">Отправить<span data-ic="arrow"></span></button>
   </div>
 
   <!-- экран: спасибо + карточка -->
   <div class="card hidden center" id="scr-done">
-    <div class="big-emoji">🎉</div>
-    <h2 id="done-title">Ура, получили!</h2>
-    <p class="sub">Вот твоя личная карточка с урока — можно сохранить и поделиться</p>
+    <div class="state-ic ok" data-ic="check"></div>
+    <h2 id="done-title">Спасибо, ответы получены</h2>
+    <div class="ai-wait hidden" id="ai-wait"><div class="spin"></div>Рисуем твою личную картинку… Обычно это около минуты, подожди немного</div>
+    <img id="ai-img" class="hidden" alt="Твоя личная AI-картинка с урока">
+    <button class="btn hidden" id="ai-dl"><span data-ic="download"></span>Скачать картинку</button>
+    <p class="sub">Вот твоя личная карточка с урока. Её можно сохранить и поделиться</p>
     <canvas id="cardCanvas" width="1080" height="1350"></canvas>
-    <button class="btn" id="dl-btn">Скачать карточку 📥</button>
-    <button class="btn ghost" id="again-btn">Изменить мои ответы ✏️</button>
-    <div class="note" id="ai-note">🎨 Скоро: личная AI-картинка, которая создаётся специально для тебя из твоего фидбека!</div>
+    <button class="btn" id="dl-btn"><span data-ic="download"></span>Скачать карточку</button>
+    <button class="btn ghost" id="again-btn"><span data-ic="pencil"></span>Изменить мои ответы</button>
   </div>
 </div>
 
@@ -149,9 +216,27 @@ const C = window.APP_CONFIG;
 let db=null, student=null, lesson=null, existing=null, photoB64=null;
 
 const $=id=>document.getElementById(id);
-const screens=['scr-msg','scr-reg','scr-form','scr-done'];
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const screens=['scr-load','scr-msg','scr-reg','scr-form','scr-done'];
 function show(id){screens.forEach(s=>$(s).classList.toggle('hidden',s!==id))}
-function msg(emoji,title,sub){$('msg-emoji').textContent=emoji;$('msg-title').textContent=title;$('msg-sub').textContent=sub;show('scr-msg')}
+
+/* ---- иконки (Lucide) ---- */
+const ICONS={
+  sparkle:'<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+  camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  arrow:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+  pencil:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>',
+  image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  alert:'<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+};
+const ic=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]}</svg>`;
+document.querySelectorAll('[data-ic]').forEach(el=>el.innerHTML=ic(el.dataset.ic));
+
+function msg(icon,title,sub){$('msg-icon').innerHTML=ic(icon);$('msg-title').textContent=title;$('msg-sub').textContent=sub;show('scr-msg')}
 
 // склонение: 1 вопрос / 2 вопроса / 5 вопросов
 function qWord(n){
@@ -166,12 +251,12 @@ function minAnswers(){
 }
 
 async function init(){
-  if(!C||C.SUPABASE_URL.startsWith('PASTE')){msg('🔌','Сайт ещё не подключён','Нужно заполнить config.js');return}
+  if(!C||C.SUPABASE_URL.startsWith('PASTE')){msg('alert','Сайт ещё не подключён','Нужно заполнить config.js');return}
   db = supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
 
   const {data:lessons,error} = await db.from('shoshi_lessons').select('*').eq('is_open',true).order('created_at',{ascending:false}).limit(1);
-  if(error){msg('😵','Что-то пошло не так',error.message);return}
-  if(!lessons?.length){msg('🌙','Сейчас нет открытого урока','Загляните, когда откроется следующий 🙂');return}
+  if(error){msg('alert','Не удалось подключиться','Проверь интернет и обнови страницу');return}
+  if(!lessons?.length){msg('moon','Сейчас нет открытого урока','Загляни, когда откроется следующий');return}
   lesson = lessons[0];
 
   const sid = localStorage.getItem('student_id');
@@ -199,8 +284,8 @@ $('photo-input').onchange=e=>{
   const f=e.target.files[0]; if(!f)return;
   compressPhoto(f,b64=>{
     photoB64=b64;
-    $('photo-preview').src=photoB64;$('photo-preview').classList.remove('hidden');
-    $('photo-hint').textContent='📷 Нажмите ещё раз, чтобы заменить';
+    $('photo-slot').innerHTML=`<img src="${b64}" alt="">`;
+    $('photo-hint').textContent='Заменить фото';
   });
 };
 // смена фото для существующего пользователя — сохраняется на все следующие разы
@@ -211,7 +296,7 @@ $('photo-change').onchange=e=>{
     const {error}=await db.from('shoshi_students').update({photo_base64:b64}).eq('id',student.id);
     if(error){alert('Ошибка при сохранении фото: '+error.message);return}
     student.photo_base64=b64;
-    $('hi-avatar').innerHTML=`<img src="${b64}">`;
+    $('hi-avatar').innerHTML=`<img src="${b64}" alt="">`;
   });
 };
 let foundMatch=null;
@@ -221,9 +306,9 @@ function regReset(){$('reg-found').classList.add('hidden');$('reg-main').classLi
 $('reg-btn').onclick=async()=>{
   const name=normName($('reg-name').value);
   $('reg-err').classList.add('hidden');
-  if(name.length<2){regErr('Напишите имя 🙂');return}
+  if(name.length<2){regErr('Напиши своё имя');return}
   if(name.split(' ').length<2&&!/[0-9._-]/.test(name)){
-    regErr('Чтобы мы всегда узнавали вас одинаково — напишите имя и фамилию (или имя с цифрами, например: Маша770)');return
+    regErr('Чтобы мы всегда узнавали тебя одинаково, напиши имя и фамилию (или имя с цифрами, например: Маша770)');return
   }
   $('reg-btn').disabled=true;
   // узнавание по имени — если имя уже есть, это скорее всего тот же ученик с другого устройства
@@ -236,7 +321,7 @@ $('reg-btn').onclick=async()=>{
   }
   const {data,error}=await db.from('shoshi_students').insert({name,photo_base64:photoB64}).select().single();
   $('reg-btn').disabled=false;
-  if(error){regErr('Ошибка: '+error.message);return}
+  if(error){regErr('Не получилось сохранить. Попробуй ещё раз');return}
   student=data; localStorage.setItem('student_id',data.id); openForm();
 };
 $('found-yes').onclick=()=>{
@@ -245,7 +330,7 @@ $('found-yes').onclick=()=>{
 };
 $('found-no').onclick=()=>{
   regReset();
-  regErr('Похоже, кто-то с таким именем уже есть — добавьте что-то своё, например фамилию или цифры: Маша К 12');
+  regErr('Похоже, кто-то с таким именем уже есть. Добавь что-то своё, например фамилию или цифры: Маша К 12');
 };
 
 /* ---- форма ---- */
@@ -258,38 +343,49 @@ function pick3(seed){
   for(let i=0;i<3;i++){h=(h*48271)%2147483647;out.push(arr.splice(h%arr.length,1)[0])}
   return out;
 }
+function updateProgress(){
+  const tas=[...document.querySelectorAll('#questions textarea')], minA=minAnswers();
+  tas.forEach(t=>t.closest('.qblock').classList.toggle('answered',!!t.value.trim()));
+  const cnt=tas.filter(t=>t.value.trim()).length, full=cnt>=minA;
+  $('prog-text').textContent=full?'Можно отправлять':`Отвечено ${cnt} из ${minA}`;
+  $('prog-bar').style.width=Math.min(100,cnt/minA*100)+'%';
+  $('prog').classList.toggle('full',full);
+}
 async function openForm(){
   $('hi-name').textContent='Привет, '+student.name+'!';
   $('hi-lesson').textContent=lesson.title;
-  $('hi-avatar').innerHTML=student.photo_base64?`<img src="${student.photo_base64}">`:`<span class="noimg">${student.name[0]}</span>`;
+  $('hi-avatar').innerHTML=student.photo_base64?`<img src="${student.photo_base64}" alt="">`:`<span class="noimg">${esc(student.name[0])}</span>`;
   const minA=minAnswers();
   $('form-hint').textContent=minA>1
-    ? `Ответьте хотя бы на ${minA} ${qWord(minA)} — выбирайте то, что ближе всего вам 🙂`
-    : 'Отвечайте на то, что откликается — даже один ответ очень ценен 🙂';
+    ? `Ответь хотя бы на ${minA} ${qWord(minA)}. Выбирай то, что тебе ближе.`
+    : 'Отвечай на то, что откликается. Даже один ответ очень ценен.';
+  if(lesson.images_on!==false&&student.photo_base64)$('form-hint').textContent+=' Из твоего фото ИИ (OpenAI) создаст личную картинку.';
 
   const {data}=await db.from('shoshi_responses').select('*').eq('lesson_id',lesson.id).eq('student_id',student.id).maybeSingle();
   existing=data||null;
+  $('see-img').classList.toggle('hidden',!(existing?.image_url||['generating','queued'].includes(existing?.image_status)));
 
   const qs=(lesson.questions||[]).map(normQ);
   $('questions').innerHTML=qs.map((qo,i)=>{
     const prev=existing?.answers?.[i]||{};
     let extra='',ph='Пара слов от тебя...';
     if(qo.type==='emoji'){
-      ph='Пара слов — почему именно это?';
+      ph='Пара слов: почему именно это?';
       extra=`<div class="chips">${pick3(lesson.id+'-'+i).map(e=>
         `<button type="button" class="chip-e${prev.emoji===e?' sel':''}" data-e="${e}">${e}</button>`).join('')}</div>`;
     }
     if(qo.type==='openers'){
-      ph='Выберите начало или напишите своё...';
+      ph='Выбери начало или напиши своё...';
       extra=`<div class="chips">${(qo.options||[]).map(o=>
-        `<button type="button" class="chip-o" data-o="${o}">${o}</button>`).join('')}</div>`;
+        `<button type="button" class="chip-o" data-o="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
     }
     return `<div class="qblock" data-i="${i}">
-      <div class="qrow"><span class="qnum">${i+1}</span><span class="txt">${qo.q}</span></div>
+      <div class="qrow"><span class="qnum">${i+1}</span><span class="txt">${esc(qo.q)}</span></div>
       ${extra}
-      <textarea data-q="${i}" placeholder="${ph}">${prev.a||''}</textarea>
+      <textarea data-q="${i}" aria-label="${esc(qo.q)}" placeholder="${ph}">${esc(prev.a)}</textarea>
     </div>`;
   }).join('');
+  $('questions').oninput=updateProgress;
 
   document.querySelectorAll('#questions .chip-e').forEach(b=>b.onclick=()=>{
     b.closest('.qblock').querySelectorAll('.chip-e').forEach(x=>x.classList.remove('sel'));
@@ -304,8 +400,9 @@ async function openForm(){
     let rest=ta.value;
     opts.forEach(o=>{if(rest.startsWith(o+' — '))rest=rest.slice((o+' — ').length)});
     ta.value=OTHER_LABELS.includes(b.dataset.o)?rest:b.dataset.o+' — '+rest;
-    ta.focus();
+    ta.focus(); updateProgress();
   });
+  updateProgress();
   show('scr-form');
 }
 $('switch-user').onclick=()=>{localStorage.removeItem('student_id');student=null;photoB64=null;show('scr-reg')};
@@ -322,84 +419,117 @@ $('send-btn').onclick=async()=>{
   const minA=minAnswers(), cnt=answers.filter(x=>x.a).length;
   if(cnt<minA){
     $('form-err').textContent=minA>1
-      ? `Пожалуйста, ответьте хотя бы на ${minA} ${qWord(minA)} 🙂 (пока ${cnt})`
-      : 'Напишите хотя бы один ответ 🙂';
+      ? `Пожалуйста, ответь хотя бы на ${minA} ${qWord(minA)} (пока ${cnt})`
+      : 'Напиши хотя бы один ответ';
     $('form-err').classList.remove('hidden');return
   }
   $('form-err').classList.add('hidden');$('send-btn').disabled=true;
   let error;
-  if(existing){({error}=await db.from('shoshi_responses').update({answers}).eq('id',existing.id))}
+  if(existing){({error}=await db.from('shoshi_responses').update({answers}).eq('id',existing.id));if(!error)existing.answers=answers}
   else{
     const r=await db.from('shoshi_responses').insert({lesson_id:lesson.id,student_id:student.id,student_name:student.name,answers}).select().single();
     error=r.error; existing=r.data;
   }
   $('send-btn').disabled=false;
-  if(error){$('form-err').textContent='Ошибка при отправке: '+error.message;$('form-err').classList.remove('hidden');return}
+  if(error){$('form-err').textContent='Не получилось отправить. Проверь интернет и попробуй ещё раз';$('form-err').classList.remove('hidden');return}
   drawCard(answers); show('scr-done'); window.scrollTo({top:0,behavior:'smooth'});
+  startImage(true);
 };
-$('again-btn').onclick=()=>openForm();
+$('again-btn').onclick=()=>{clearTimeout(imgTimer);openForm()};
+$('see-img').onclick=()=>{
+  drawCard(existing.answers||[]); show('scr-done'); window.scrollTo({top:0,behavior:'smooth'});
+  startImage(false);
+};
+
+/* ---- личная AI-картинка: ключ на сервере, браузер только спрашивает статус ---- */
+let imgTimer=null;
+function startImage(retry){
+  clearTimeout(imgTimer);
+  $('ai-img').classList.add('hidden');$('ai-dl').classList.add('hidden');$('ai-wait').classList.add('hidden');
+  if(lesson.images_on===false||!existing?.id)return;
+  if(existing.image_url)return showImage(existing.image_url);
+  $('ai-wait').classList.remove('hidden');
+  pollImage(retry,0);
+}
+async function pollImage(retry,tries){
+  const {data,error}=await db.functions.invoke('shoshi-image',{body:{response_id:existing.id,retry}});
+  if(data?.status==='done'){existing.image_url=data.image_url;return showImage(data.image_url)}
+  const waiting=error?tries<3:['generating','queued'].includes(data?.status);
+  if(waiting&&tries<50){imgTimer=setTimeout(()=>pollImage(false,tries+1),12000);return}
+  $('ai-wait').classList.add('hidden'); // не вышло — у ученика всё равно есть карточка
+}
+function showImage(url){
+  $('ai-img').onload=()=>{
+    $('ai-wait').classList.add('hidden');
+    $('ai-img').classList.remove('hidden');$('ai-dl').classList.remove('hidden');
+  };
+  $('ai-img').src=url;
+}
+$('ai-dl').onclick=async()=>{
+  const blob=await (await fetch($('ai-img').src)).blob();
+  const a=document.createElement('a');
+  a.download='моя-картинка.jpg'; a.href=URL.createObjectURL(blob); a.click();
+};
 
 /* ---- личная карточка (canvas) ---- */
-const PALETTES=[['#667eea','#764ba2','#f093fb'],['#0ba360','#3cba92','#a8e063'],['#ff9966','#ff5e62','#ffc371'],['#36d1dc','#5b86e5','#8ed6ff'],['#f857a6','#ff5858','#ffb199']];
+const PALETTES=[['#4338CA','#6D5BD0','#A78BFA'],['#0F766E','#14917F','#5EBFA5'],['#C2410C','#E0653A','#F2A65A'],['#1D4ED8','#3B78E0','#7FB2F0'],['#9D174D','#C9386F','#EC8FAE']];
 function cardPalette(){
   // фон карточки: Шоши может задать свой в админке (card_bg), иначе — по уроку
   const custom=(lesson.card_bg||'').split(',').map(s=>s.trim()).filter(s=>/^#[0-9a-fA-F]{3,8}$/.test(s));
   if(custom.length>=2)return [custom[0],custom[1]||custom[0],custom[2]||custom[1]];
   return PALETTES[Math.abs([...lesson.id].reduce((a,c)=>a+c.charCodeAt(0),0))%PALETTES.length];
 }
+const CARD_FONTS=['800 72px Onest','500 40px Onest','600 44px Onest','400 38px Onest','500 32px Onest'];
 function drawCard(answers){
   const cv=$('cardCanvas'),x=cv.getContext('2d'),W=cv.width,H=cv.height;
   const pal=cardPalette();
-  document.fonts.ready.then(()=>{
+  Promise.all(CARD_FONTS.map(f=>document.fonts.load(f))).then(()=>{
     const g=x.createLinearGradient(0,0,W,H);
-    g.addColorStop(0,pal[0]);g.addColorStop(.5,pal[1]);g.addColorStop(1,pal[2]);
+    g.addColorStop(0,pal[0]);g.addColorStop(.55,pal[1]);g.addColorStop(1,pal[2]);
     x.fillStyle=g;x.fillRect(0,0,W,H);
-    x.globalAlpha=.12;x.fillStyle='#fff';
-    [[130,150,180],[950,220,120],[880,1180,200],[160,1150,140]].forEach(([cx,cy,r])=>{x.beginPath();x.arc(cx,cy,r,0,7);x.fill()});
-    x.globalAlpha=1; x.textAlign='center'; x.direction='ltr';
+    x.textAlign='center'; x.direction='ltr';
 
-    let y=170;
     if(student.photo_base64){
       const im=new Image();
       im.onload=()=>{
-        x.save();x.beginPath();x.arc(W/2,230,130,0,7);x.clip();
-        const s=Math.max(260/im.width,260/im.height);
-        x.drawImage(im,W/2-im.width*s/2,230-im.height*s/2,im.width*s,im.height*s);
+        x.save();x.beginPath();x.arc(W/2,220,120,0,7);x.clip();
+        const s=Math.max(240/im.width,240/im.height);
+        x.drawImage(im,W/2-im.width*s/2,220-im.height*s/2,im.width*s,im.height*s);
         x.restore();
-        x.lineWidth=10;x.strokeStyle='rgba(255,255,255,.9)';x.beginPath();x.arc(W/2,230,130,0,7);x.stroke();
-        rest(400);
+        x.lineWidth=8;x.strokeStyle='rgba(255,255,255,.95)';x.beginPath();x.arc(W/2,220,120,0,7);x.stroke();
+        rest(380);
       };
       im.src=student.photo_base64;
-    } else rest(y);
+    } else rest(150);
 
     function rest(y0){
       let y=y0;
-      x.fillStyle='#fff';x.font='900 76px Rubik';
+      x.fillStyle='#fff';x.font=CARD_FONTS[0];
       x.fillText(student.name,W/2,y+40); y+=110;
-      x.font='500 42px Rubik';x.globalAlpha=.92;
-      x.fillText(lesson.title,W/2,y); y+=60; x.globalAlpha=1;
+      x.font=CARD_FONTS[1];x.globalAlpha=.9;
+      x.fillText(lesson.title,W/2,y); y+=56; x.globalAlpha=1;
 
       if(lesson.lesson_point){
-        x.font='700 46px Rubik';
-        const lines=wrap(x,'💡 '+lesson.lesson_point,W-200);
-        roundRect(x,90,y,W-180,lines.length*62+50,30,'rgba(255,255,255,.18)');
+        x.font=CARD_FONTS[2];
+        const lines=wrap(x,lesson.lesson_point,W-220);
+        roundRect(x,90,y,W-180,lines.length*60+48,24,'rgba(255,255,255,.16)');
         x.fillStyle='#fff';
-        lines.forEach((l,i)=>x.fillText(l,W/2,y+70+i*62));
-        y+=lines.length*62+90;
+        lines.forEach((l,i)=>x.fillText(l,W/2,y+66+i*60));
+        y+=lines.length*60+84;
       }
-      x.font='400 38px Rubik';
+      x.font=CARD_FONTS[3];
       answers.filter(a=>a.a).slice(0,3).forEach(a=>{
         let t=(a.emoji?a.emoji+' ':'')+a.a;
         if(t.length>90)t=t.slice(0,88)+'…';
-        const lines=wrap(x,'"'+t+'"',W-260);
-        roundRect(x,120,y,W-240,lines.length*52+40,26,'rgba(255,255,255,.92)');
-        x.fillStyle='#2d2a45';
-        lines.forEach((l,i)=>x.fillText(l,W/2,y+58+i*52));
-        x.fillStyle='#fff'; y+=lines.length*52+70;
+        const lines=wrap(x,t,W-260);
+        roundRect(x,110,y,W-220,lines.length*50+44,22,'#fff');
+        x.fillStyle='#1B1A2A';
+        lines.forEach((l,i)=>x.fillText(l,W/2,y+58+i*50));
+        x.fillStyle='#fff'; y+=lines.length*50+64;
       });
-      x.font='500 34px Rubik';x.globalAlpha=.85;
+      x.font=CARD_FONTS[4];x.globalAlpha=.85;
       const footer=(lesson.card_text||'').trim()||'Урок Шоши';
-      x.fillText('✨ '+new Date().toLocaleDateString('ru-RU')+' • '+footer+' ✨',W/2,H-70);
+      x.fillText(new Date().toLocaleDateString('ru-RU')+'  ·  '+footer,W/2,H-64);
       x.globalAlpha=1;
     }
   });

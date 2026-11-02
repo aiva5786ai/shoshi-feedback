@@ -3,155 +3,222 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ניהול פידבק — שושי 💜</title>
+<title>ניהול פידבק — שושי</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
 <style>
-  :root{--grad:linear-gradient(135deg,#667eea,#764ba2);--ink:#2d2a45;--muted:#8b87a3;--accent:#7c5cff;--bg:#f4f2fc}
+  :root{
+    --bg:#F6F5FA; --surface:#fff; --ink:#1B1A2A; --muted:#5E5C72; --line:#E4E2EC;
+    --accent:#4F46E5; --accent-hover:#4338CA; --accent-soft:#EEEEFD; --accent-line:#C7C4F5;
+    --danger:#B42318; --danger-soft:#FEF3F2; --danger-line:#FECDCA;
+    --ok:#127A4B; --ok-soft:#E6F6EE;
+  }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Rubik',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
-  header{background:var(--grad);color:#fff;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-  header h1{font-size:1.3rem;font-weight:900}
-  .tabs{display:flex;gap:8px;flex-wrap:wrap}
-  .tab{border:none;background:rgba(255,255,255,.18);color:#fff;font:inherit;font-weight:500;padding:9px 18px;border-radius:99px;cursor:pointer}
-  .tab.on{background:#fff;color:var(--accent);font-weight:700}
-  main{max-width:860px;margin:24px auto;padding:0 16px 60px}
-  .card{background:#fff;border-radius:20px;padding:24px;box-shadow:0 8px 30px rgba(60,40,120,.08);margin-bottom:18px}
-  h2{font-size:1.15rem;margin-bottom:4px}
-  .sub{color:var(--muted);font-size:.88rem;margin-bottom:16px}
-  label{display:block;font-weight:500;margin:14px 0 6px;font-size:.93rem}
-  input,textarea,select{width:100%;border:2px solid #eceafd;border-radius:12px;padding:11px 13px;font:inherit;background:#faf9ff}
-  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
-  textarea{resize:vertical;min-height:80px}
-  .btn{border:none;border-radius:12px;padding:12px 22px;background:var(--grad);color:#fff;font:inherit;font-weight:700;cursor:pointer;margin-top:16px}
-  .btn.ghost{background:#f1eefe;color:var(--accent)}
-  .btn.small{padding:8px 14px;font-size:.85rem;margin-top:0}
-  .btn:disabled{opacity:.5}
+  body{font-family:'Heebo',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased}
+  svg.ic{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-.2em}
+  button{font:inherit;color:inherit;cursor:pointer}
+  button:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .topbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px 20px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:38px;height:38px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+  .brand h1{font-size:1.0625rem;font-weight:700;line-height:1.2}
+  .brand small{color:var(--muted);font-size:.8125rem}
+  .tabs{display:flex;gap:4px;flex-wrap:wrap}
+  .tab{display:inline-flex;align-items:center;gap:7px;border:none;background:none;color:var(--muted);font-weight:500;font-size:.9375rem;padding:9px 14px;min-height:42px;border-radius:10px;transition:background-color .15s,color .15s}
+  .tab:hover{background:var(--bg);color:var(--ink)}
+  .tab.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+
+  main{max-width:780px;margin:24px auto;padding:0 16px 40px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 1px 2px rgba(27,26,42,.04);margin-bottom:14px}
+  h2{font-size:1.0625rem;font-weight:700;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+  h2 svg.ic{color:var(--accent)}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:12px}
+  label{display:block;font-weight:600;margin:14px 0 6px;font-size:.9375rem}
+  input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:1rem;color:var(--ink);background:#fff;transition:border-color .15s,box-shadow .15s}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.15)}
+  textarea{resize:vertical;min-height:88px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid transparent;border-radius:10px;padding:10px 18px;min-height:44px;background:var(--accent);color:#fff;font-weight:600;transition:background-color .15s,border-color .15s;margin-top:14px}
+  .btn:hover{background:var(--accent-hover)}
+  .btn.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+  .btn.ghost:hover{background:var(--bg)}
+  .btn.small{padding:7px 12px;min-height:38px;font-size:.875rem;margin-top:0;font-weight:500}
+  .btn:disabled{opacity:.55;cursor:wait}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .pill{display:inline-block;padding:4px 12px;border-radius:99px;font-size:.78rem;font-weight:700}
-  .pill.open{background:#e3f9ec;color:#177245}.pill.closed{background:#ffeef0;color:#a12735}
-  .qedit{border:1.5px solid #eceafd;border-radius:14px;padding:12px;margin-top:10px;background:#faf9ff}
-  .qedit .row{gap:8px;flex-wrap:nowrap}
+  .between{justify-content:space-between}
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;font-size:.8125rem;font-weight:600;white-space:nowrap}
+  .pill.open{background:var(--ok-soft);color:var(--ok)}
+  .pill.closed{background:var(--danger-soft);color:var(--danger)}
+
+  .switch{display:flex;align-items:center;gap:12px;font-weight:500;margin:12px 0 2px;cursor:pointer}
+  .switch input{position:absolute;opacity:0;width:0;height:0}
+  .switch i{position:relative;width:44px;height:26px;border-radius:99px;background:#CFCDDA;flex:none;transition:background-color .15s}
+  .switch i::after{content:"";position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+  .switch input:checked+i{background:var(--accent)}
+  .switch input:checked+i::after{transform:translateX(-18px)}
+  .switch input:focus-visible+i{outline:2px solid var(--accent);outline-offset:2px}
+
+  .qedit{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:#FBFBFE}
+  .qedit .row{gap:8px}
   .qedit select{width:auto;flex:none}
-  .qedit input{flex:1;min-width:120px}
-  .qedit .mini{border:none;background:#f1eefe;color:var(--accent);border-radius:8px;padding:8px 11px;cursor:pointer;font:inherit;flex:none}
+  .qedit input{flex:1 1 200px;min-width:0}
+  .qedit .mini{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:8px;width:38px;height:38px;flex:none;transition:background-color .15s,color .15s}
+  .qedit .mini:hover{background:var(--bg);color:var(--ink)}
+  .qedit .qe-del:hover{background:var(--danger-soft);color:var(--danger)}
   .qedit textarea{margin-top:8px;min-height:64px}
-  .qedit .hint{color:var(--muted);font-size:.8rem;margin:8px 2px 0}
-  .resp{border:1.5px solid #eceafd;border-radius:16px;padding:16px;margin-top:12px}
+  .qedit .hint{color:var(--muted);font-size:.8125rem;margin:8px 2px 0}
+
+  .savebar{position:sticky;bottom:12px;z-index:10;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:0 6px 24px rgba(27,26,42,.1);display:flex;gap:8px;flex-wrap:wrap}
+  .savebar .btn{margin:0}
+  .fine{color:var(--muted);font-size:.8125rem;margin:10px 4px 0}
+
+  .resp{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
   .resp .who{display:flex;align-items:center;gap:10px;margin-bottom:8px}
   .resp .who img,.resp .who .noimg{width:40px;height:40px;border-radius:50%;object-fit:cover}
-  .resp .who .noimg{background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900}
-  .resp .who small{color:var(--muted);display:block}
-  .qa{margin:7px 0;font-size:.92rem}
-  .qa b{color:var(--accent);font-weight:500;display:block;font-size:.8rem}
+  .resp .who .noimg{background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700}
+  .resp .who small{color:var(--muted);display:block;font-size:.8125rem}
+  .resp .gen{display:block;max-width:220px;border-radius:10px;border:1px solid var(--line);margin-top:10px}
+  .qa{margin:8px 0;font-size:.9375rem}
+  .qa b{color:var(--muted);font-weight:500;display:block;font-size:.8125rem}
   .hidden{display:none!important}
-  .note{background:#fff7e6;border:1.5px solid #ffe3a3;border-radius:12px;padding:12px;font-size:.85rem;color:#8a6d1a;margin-top:12px;line-height:1.5}
-  .ok{background:#e3f9ec;border-color:#a9e8c4;color:#177245}
-  .toast{position:fixed;bottom:22px;right:50%;transform:translateX(50%);background:var(--ink);color:#fff;padding:12px 24px;border-radius:99px;opacity:0;transition:.3s;pointer-events:none;z-index:99}
+  .note{background:var(--accent-soft);border-radius:10px;padding:12px 14px;font-size:.9rem;color:#34308F;margin-top:12px}
+  .gate-err{background:var(--danger-soft);border:1px solid var(--danger-line);color:var(--danger);border-radius:10px;padding:10px;font-size:.9rem;margin-top:10px}
+  .toast{position:fixed;bottom:22px;right:50%;transform:translateX(50%);background:var(--ink);color:#fff;padding:10px 20px;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:99;font-size:.9375rem;max-width:90vw}
   .toast.show{opacity:1}
   /* גייט */
-  #gate{position:fixed;inset:0;background:var(--grad);display:flex;align-items:center;justify-content:center;z-index:50}
-  #gate .card{width:min(360px,90vw);text-align:center}
+  #gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+  #gate .card{width:min(380px,100%);text-align:center;padding:28px 24px;box-shadow:0 8px 28px rgba(27,26,42,.08)}
+  #gate .logo{margin:0 auto 14px;width:46px;height:46px;font-size:1.2rem}
+  #gate h2{justify-content:center;font-size:1.25rem}
+  #gate input{text-align:center}
+  #gate .btn{width:100%}
   /* הקרנה */
-  #proj{position:fixed;inset:0;background:#17142b;color:#fff;z-index:60;overflow:auto;padding:30px}
-  #proj .bar{display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:26px;flex-wrap:wrap}
-  #proj h2{color:#fff;font-size:2rem;text-align:center;margin-bottom:6px}
-  .chip{border:2px solid rgba(255,255,255,.35);background:transparent;color:#fff;font:inherit;padding:8px 18px;border-radius:99px;cursor:pointer}
-  .chip.on{background:#fff;color:#17142b;font-weight:700}
-  #proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;max-width:1400px;margin:0 auto}
+  #proj{position:fixed;inset:0;background:#12111C;color:#fff;z-index:60;overflow:auto;padding:28px}
+  #proj .bar{display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:26px;flex-wrap:wrap}
+  #proj h2{color:#fff;font-size:2rem;justify-content:center;margin-bottom:4px}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;padding:8px 16px;min-height:42px;border-radius:10px;transition:background-color .15s}
+  .chip:hover{background:rgba(255,255,255,.1)}
+  .chip.on{background:#fff;color:#12111C;font-weight:600}
+  #proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:1400px;margin:0 auto}
   #proj-grid.names{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
-  .pcard{background:rgba(255,255,255,.08);border-radius:18px;padding:20px;animation:fin .4s ease}
-  @keyframes fin{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
-  .pcard .pname{font-weight:900;font-size:1.25rem;display:flex;align-items:center;gap:10px}
+  .pcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px;animation:fin .3s ease}
+  @keyframes fin{from{opacity:0}to{opacity:1}}
+  .pcard .pname{font-weight:700;font-size:1.25rem;display:flex;align-items:center;gap:10px}
   .pcard .pname img{width:44px;height:44px;border-radius:50%;object-fit:cover}
-  .pcard .pans{margin-top:10px;font-size:1rem;line-height:1.5;opacity:.92}
-  .pcard img.gen{width:100%;border-radius:12px;margin-top:10px}
+  .pcard .pans{font-size:1.0625rem;line-height:1.55}
+  .pcard img.gen{display:block;width:100%;border-radius:10px}
+  .pcard:has(img.gen){padding:8px}
+  @media (max-width:560px){.tab{padding:8px 10px;font-size:.875rem}.card{padding:18px 16px}}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
 </style>
 </head>
 <body>
 
 <div id="gate">
   <div class="card">
-    <h2>💜 שלום שושי</h2>
+    <div class="logo" data-ic="sparkle"></div>
+    <h2>שלום שושי</h2>
     <p class="sub">הכניסי קוד כדי להיכנס לניהול</p>
-    <input type="password" id="gate-pass" placeholder="קוד כניסה" style="text-align:center">
-    <div class="note hidden" id="gate-err" style="background:#ffeef0;border-color:#ffc2c9;color:#a12735">קוד שגוי</div>
-    <button class="btn" id="gate-btn" style="width:100%">כניסה</button>
+    <input type="password" id="gate-pass" placeholder="קוד כניסה" aria-label="קוד כניסה">
+    <div class="gate-err hidden" id="gate-err">קוד שגוי</div>
+    <button class="btn" id="gate-btn">כניסה</button>
   </div>
 </div>
 
-<header>
-  <h1>ניהול הפידבק 💜</h1>
-  <div class="tabs">
-    <button class="tab on" data-t="lesson">📝 השיעור</button>
-    <button class="tab" data-t="resps">💌 תגובות</button>
-    <button class="tab" data-t="projBtn">📽️ הקרנה</button>
-    <button class="tab" data-t="setts">⚙️ הגדרות</button>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo" data-ic="sparkle"></span>
+    <div><h1>ניהול הפידבק</h1><small>השיעורים של שושי</small></div>
   </div>
+  <nav class="tabs">
+    <button class="tab on" data-t="lesson"><span data-ic="file"></span>השיעור</button>
+    <button class="tab" data-t="resps"><span data-ic="message"></span>תגובות</button>
+    <button class="tab" data-t="projBtn"><span data-ic="screen"></span>הקרנה</button>
+    <button class="tab" data-t="setts"><span data-ic="sliders"></span>הגדרות</button>
+  </nav>
 </header>
 
 <main>
   <!-- טאב שיעור -->
   <section id="t-lesson">
     <div class="card">
-      <div class="row" style="justify-content:space-between">
+      <div class="row between">
         <div><h2>השיעור הנוכחי</h2><p class="sub" style="margin:0">מה שהתלמידים רואים עכשיו בקישור</p></div>
         <span class="pill" id="l-pill"></span>
       </div>
-      <label>שם השיעור</label>
+      <label for="l-title">שם השיעור</label>
       <input id="l-title">
-      <label>הנקודה המרכזית של השיעור 💡 (תופיע בתוצר של התלמידים)</label>
+      <label for="l-point">הנקודה המרכזית של השיעור (תופיע בתוצר של התלמידים)</label>
       <input id="l-point" placeholder="למשל: חשוב להיות גאה ביהדות">
-      <label>השאלות — התלמידים עונים רק על מה שמדבר אליהם</label>
+    </div>
+
+    <div class="card">
+      <h2><span data-ic="message"></span>שאלות</h2>
+      <p class="sub" style="margin:0">התלמידים עונים רק על מה שמדבר אליהם</p>
       <div id="q-editor"></div>
-      <button class="btn ghost small" id="q-add" style="margin-top:10px">➕ הוספת שאלה</button>
-      <label>סגנון התמונה (לשלב ב', כשיופעל מפתח התמונות)</label>
+      <button class="btn ghost small" id="q-add" style="margin-top:10px"><span data-ic="plus"></span>הוספת שאלה</button>
+      <label for="l-min">כמה תשובות חובה לפחות?</label>
+      <input id="l-min" type="number" min="1" max="9" value="3" style="width:110px">
+    </div>
+
+    <div class="card">
+      <h2><span data-ic="image"></span>תמונת AI אישית</h2>
+      <label class="switch"><input type="checkbox" id="l-images"><i></i>ליצור לכל תלמיד תמונה אישית בשיעור הזה (כ-20 אג' לתמונה)</label>
+      <label for="l-style">סגנון התמונה</label>
       <select id="l-style">
         <option>קומיקס</option><option>פיקסאר</option><option>ציור בצבעי מים</option>
         <option>איור מצויר</option><option>פוסטר קולנוע</option><option>פיקסל ארט</option>
       </select>
-      <label>הנחיות לתמונה (הפרומפט)</label>
+      <label for="l-prompt">הנחיות לתמונה (הפרומפט)</label>
       <textarea id="l-prompt"></textarea>
-      <label>כמה תשובות חובה לפחות?</label>
-      <input id="l-min" type="number" min="1" max="9" value="3" style="width:110px">
-      <label>רקע הכרטיס האישי 🎨</label>
+    </div>
+
+    <div class="card">
+      <h2><span data-ic="palette"></span>הכרטיס האישי</h2>
+      <label for="l-bg">רקע הכרטיס</label>
       <div class="row">
         <select id="l-bg" style="width:auto">
           <option value="">אוטומטי (משתנה בכל שיעור)</option>
-          <option value="#667eea,#764ba2,#f093fb">סגול–ורוד</option>
-          <option value="#0ba360,#3cba92,#a8e063">ירוק</option>
-          <option value="#ff9966,#ff5e62,#ffc371">כתום</option>
-          <option value="#36d1dc,#5b86e5,#8ed6ff">תכלת</option>
-          <option value="#f857a6,#ff5858,#ffb199">ורוד–אדום</option>
+          <option value="#4338CA,#6D5BD0,#A78BFA">סגול</option>
+          <option value="#0F766E,#14917F,#5EBFA5">ירוק</option>
+          <option value="#C2410C,#E0653A,#F2A65A">כתום</option>
+          <option value="#1D4ED8,#3B78E0,#7FB2F0">כחול</option>
+          <option value="#9D174D,#C9386F,#EC8FAE">ורוד</option>
           <option value="custom">מותאם אישית…</option>
         </select>
-        <span id="l-bg-custom" class="hidden">
-          <input type="color" id="bg1" value="#667eea" style="width:46px;height:38px;padding:2px">
-          <input type="color" id="bg2" value="#764ba2" style="width:46px;height:38px;padding:2px">
-          <input type="color" id="bg3" value="#f093fb" style="width:46px;height:38px;padding:2px">
+        <span id="l-bg-custom" class="hidden row">
+          <input type="color" id="bg1" value="#667eea" aria-label="צבע 1" style="width:46px;height:40px;padding:3px">
+          <input type="color" id="bg2" value="#764ba2" aria-label="צבע 2" style="width:46px;height:40px;padding:3px">
+          <input type="color" id="bg3" value="#f093fb" aria-label="צבע 3" style="width:46px;height:40px;padding:3px">
         </span>
       </div>
-      <label>הטקסט בתחתית הכרטיס (מופיע ליד התאריך — כדאי ברוסית)</label>
+      <label for="l-ctext">הטקסט בתחתית הכרטיס (מופיע ליד התאריך, כדאי ברוסית)</label>
       <input id="l-ctext" placeholder="Урок Шоши">
-      <div class="row">
-        <button class="btn" id="l-save">שמירת שינויים 💾</button>
-        <button class="btn ghost" id="l-toggle"></button>
-        <button class="btn ghost" id="l-new">➕ שיעור חדש (מעתיק את ההגדרות)</button>
-      </div>
-      <div class="note">💡 <b>שיעור חדש</b> מעתיק את השאלות והסגנון מהשיעור הנוכחי — משנים רק מה שרוצים, בלי להזין הכל מחדש.</div>
     </div>
+
+    <div class="savebar">
+      <button class="btn" id="l-save"><span data-ic="save"></span>שמירת שינויים</button>
+      <button class="btn ghost" id="l-toggle"></button>
+      <button class="btn ghost" id="l-new"><span data-ic="plus"></span>שיעור חדש</button>
+    </div>
+    <p class="fine"><b>שיעור חדש</b> מעתיק את השאלות והסגנון מהשיעור הנוכחי. משנים רק מה שרוצים, בלי להזין הכול מחדש.</p>
   </section>
 
   <!-- טאב תגובות -->
   <section id="t-resps" class="hidden">
     <div class="card">
-      <h2>💌 התגובות</h2>
-      <p class="sub">כל שיעור נשמר בנפרד — בוחרים שיעור ורואים רק את התגובות שלו</p>
-      <label>בחרי שיעור</label>
+      <h2>התגובות</h2>
+      <p class="sub">כל שיעור נשמר בנפרד. בוחרים שיעור ורואים רק את התגובות שלו</p>
+      <label for="r-lesson">בחרי שיעור</label>
       <select id="r-lesson"></select>
-      <button class="btn ghost small" id="r-export" style="margin-top:12px">📥 הורדת קובץ אקסל של השיעור הזה</button>
+      <div class="row" style="margin-top:12px">
+        <button class="btn ghost small" id="r-export"><span data-ic="download"></span>הורדת קובץ אקסל של השיעור</button>
+        <button class="btn ghost small" id="r-gen"><span data-ic="image"></span>יצירת התמונות החסרות</button>
+      </div>
+      <p class="sub hidden" id="r-gen-status" style="margin:8px 0 0"></p>
       <div id="r-list"></div>
     </div>
   </section>
@@ -159,17 +226,15 @@
   <!-- טאב הגדרות -->
   <section id="t-setts" class="hidden">
     <div class="card">
-      <h2>⚙️ הגדרות</h2>
-      <label>קוד כניסה לדף הזה</label>
+      <h2>הגדרות</h2>
+      <label for="s-pass">קוד כניסה לדף הזה</label>
       <input id="s-pass">
-      <label>מפתח ליצירת תמונות AI</label>
-      <input id="s-key" placeholder="עדיין לא פעיל" disabled>
-      <div class="note">🎨 יצירת התמונות תופעל בשלב ב׳ — אחרי שתעבירי לחוה את פרטי האשראי ויהיה מפתח. בינתיים כל תלמיד מקבל כרטיס מעוצב אישי עם התשובות שלו — בחינם.</div>
-      <button class="btn" id="s-save">שמירה 💾</button>
+      <div class="note">תמונות ה-AI פעילות. המפתח שלך שמור בשרת ולא באתר. מדליקים ומכבים לכל שיעור בטאב "השיעור". כל תמונה עולה כ-20 אג' מהקרדיט שלך ב-OpenAI, ויש תקרה של 150 תמונות ביממה. את היתרה רואים ב-platform.openai.com, תחת Billing.</div>
+      <button class="btn" id="s-save"><span data-ic="save"></span>שמירה</button>
     </div>
     <div class="card">
-      <h2>👥 תלמידים רשומים</h2>
-      <div id="s-students" class="sub" style="margin-top:10px"></div>
+      <h2>תלמידים רשומים</h2>
+      <div id="s-students" class="sub" style="margin:10px 0 0"></div>
     </div>
   </section>
 </main>
@@ -180,23 +245,45 @@
     <button class="chip on" data-m="answers">תשובות בלי שמות</button>
     <button class="chip" data-m="names">רק שמות</button>
     <button class="chip" data-m="images">רק תמונות</button>
-    <button class="chip" id="proj-close">✖ יציאה</button>
+    <button class="chip" id="proj-close"><span data-ic="x"></span>יציאה</button>
   </div>
   <h2 id="proj-title"></h2>
-  <p style="text-align:center;opacity:.6;margin-bottom:24px" id="proj-count"></p>
+  <p style="text-align:center;opacity:.65;margin-bottom:24px" id="proj-count"></p>
   <div id="proj-grid"></div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 const C=window.APP_CONFIG;
 let db=null, lesson=null, settings=null, projMode='answers', projTimer=null;
 const $=id=>document.getElementById(id);
-function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
+
+/* ---- אייקונים (Lucide) ---- */
+const ICONS={
+  sparkle:'<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+  file:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>',
+  message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  screen:'<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/>',
+  sliders:'<path d="M21 4h-7"/><path d="M10 4H3"/><path d="M21 12h-9"/><path d="M8 12H3"/><path d="M21 20h-5"/><path d="M12 20H3"/><path d="M14 2v4"/><path d="M8 10v4"/><path d="M16 18v4"/>',
+  plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
+  image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+  palette:'<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
+  save:'<path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+  refresh:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  unlock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
+  x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  up:'<path d="m18 15-6-6-6 6"/>',
+  down:'<path d="m6 9 6 6 6-6"/>',
+};
+const ic=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]}</svg>`;
+document.querySelectorAll('[data-ic]').forEach(el=>el.innerHTML=ic(el.dataset.ic));
 
 async function init(){
-  if(!C||C.SUPABASE_URL.startsWith('PASTE')){document.body.innerHTML='<div style="padding:40px;text-align:center;font-family:Rubik">🔌 האתר עוד לא חובר — צריך למלא את config.js (ראי README)</div>';return}
+  if(!C||C.SUPABASE_URL.startsWith('PASTE')){document.body.innerHTML='<div style="padding:40px;text-align:center">האתר עוד לא חובר. צריך למלא את config.js (ראי README)</div>';return}
   db=supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);
   const {data}=await db.from('shoshi_settings').select('*').eq('id',1).single();
   settings=data;
@@ -217,24 +304,24 @@ async function unlock(){
 /* ---- עורך שאלות ---- */
 const DEFAULT_OPENERS=['קשור לחלומות שלי בעתיד','קשור לבחירות שאני צריך לעשות','קשור לחיי משפחה','קשור לבית','קשור לדברים פיזיים','קשור לרגשות שלי','אחר'];
 let qList=[];
-const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 function normQ(q){return typeof q==='string'?{type:'text',q}:{...q}}
 function renderQEditor(){
   $('q-editor').innerHTML=qList.map((qo,i)=>`
     <div class="qedit" data-i="${i}">
       <div class="row">
-        <select class="qe-type">
-          <option value="text"${qo.type==='text'?' selected':''}>✍️ טקסט חופשי</option>
-          <option value="emoji"${qo.type==='emoji'?' selected':''}>😊 בחירת אימוג'י</option>
-          <option value="openers"${qo.type==='openers'?' selected':''}>💬 פתיחים לבחירה</option>
+        <select class="qe-type" aria-label="סוג השאלה">
+          <option value="text"${qo.type==='text'?' selected':''}>טקסט חופשי</option>
+          <option value="emoji"${qo.type==='emoji'?' selected':''}>בחירת אימוג'י</option>
+          <option value="openers"${qo.type==='openers'?' selected':''}>פתיחים לבחירה</option>
         </select>
-        <input class="qe-q" value="${esc(qo.q)}" placeholder="נוסח השאלה">
-        <button class="mini qe-up" title="למעלה">↑</button>
-        <button class="mini qe-dn" title="למטה">↓</button>
-        <button class="mini qe-del" title="מחיקה">✖</button>
+        <input class="qe-q" value="${esc(qo.q)}" placeholder="נוסח השאלה" aria-label="נוסח השאלה">
+        <button class="mini qe-up" aria-label="להזיז למעלה" title="למעלה">${ic('up')}</button>
+        <button class="mini qe-dn" aria-label="להזיז למטה" title="למטה">${ic('down')}</button>
+        <button class="mini qe-del" aria-label="מחיקת השאלה" title="מחיקה">${ic('x')}</button>
       </div>
       ${qo.type==='openers'?`<textarea class="qe-opts" placeholder="שורה לכל פתיח">${esc((qo.options||[]).join('\n'))}</textarea>`:''}
-      ${qo.type==='emoji'?`<p class="hint">✨ אוטומטי — המערכת מגרילה 3 אימוג'ים חדשים בכל שיעור, התלמיד בוחר אחד ומסביר בכמה מילים</p>`:''}
+      ${qo.type==='emoji'?`<p class="hint">אוטומטי: המערכת מגרילה 3 אימוג'ים חדשים בכל שיעור, התלמיד בוחר אחד ומסביר בכמה מילים</p>`:''}
     </div>`).join('');
   document.querySelectorAll('.qedit').forEach(el=>{
     const i=+el.dataset.i;
@@ -261,6 +348,7 @@ async function loadLesson(){
   $('l-point').value=lesson.lesson_point||'';
   qList=(lesson.questions||[]).map(normQ);
   renderQEditor();
+  $('l-images').checked=lesson.images_on!==false;
   $('l-style').value=lesson.image_style||'קומיקס';
   $('l-prompt').value=lesson.image_prompt||'';
   $('l-min').value=lesson.min_answers??3;
@@ -279,14 +367,15 @@ async function loadLesson(){
 $('l-bg').onchange=()=>$('l-bg-custom').classList.toggle('hidden',$('l-bg').value!=='custom');
 function paintPill(){
   $('l-pill').className='pill '+(lesson.is_open?'open':'closed');
-  $('l-pill').textContent=lesson.is_open?'פתוח לתלמידים ✅':'סגור 🔒';
-  $('l-toggle').textContent=lesson.is_open?'לסגור את השיעור 🔒':'לפתוח לתלמידים ✅';
+  $('l-pill').textContent=lesson.is_open?'פתוח לתלמידים':'סגור';
+  $('l-toggle').innerHTML=lesson.is_open?ic('lock')+'לסגור את השיעור':ic('unlock')+'לפתוח לתלמידים';
 }
 function collectLesson(){
   return {
     title:$('l-title').value.trim()||'שיעור',
     lesson_point:$('l-point').value.trim(),
     questions:qList.filter(q=>q.q.trim()).map(q=>({type:q.type,q:q.q.trim(),...(q.type==='openers'?{options:q.options||[]}:{})})),
+    images_on:$('l-images').checked,
     image_style:$('l-style').value,
     image_prompt:$('l-prompt').value.trim(),
     min_answers:Math.max(1,+$('l-min').value||3),
@@ -298,7 +387,7 @@ function collectLesson(){
 async function saveLesson(fields){
   let {error}=await db.from('shoshi_lessons').update(fields).eq('id',lesson.id);
   if(error&&/column|schema/i.test(error.message)){
-    const {min_answers,card_bg,card_text,...old}=fields;
+    const {min_answers,card_bg,card_text,images_on,...old}=fields;
     ({error}=await db.from('shoshi_lessons').update(old).eq('id',lesson.id));
     if(!error)return 'partial';
   }
@@ -306,15 +395,15 @@ async function saveLesson(fields){
 }
 $('l-save').onclick=async()=>{
   const r=await saveLesson(collectLesson());
-  if(r==='partial'){toast('נשמר חלקית — צריך להריץ את migration-2.sql ב-Supabase');return loadLessonList()}
+  if(r==='partial'){toast('נשמר חלקית, צריך להריץ את המיגרציות ב-Supabase');return loadLessonList()}
   if(r)return toast('שגיאה: '+r.message);
-  toast('נשמר! 💜'); loadLessonList();
+  toast('נשמר'); loadLessonList();
 };
 $('l-toggle').onclick=async()=>{
   const {error}=await db.from('shoshi_lessons').update({is_open:!lesson.is_open}).eq('id',lesson.id);
   if(error)return toast('שגיאה: '+error.message);
   lesson.is_open=!lesson.is_open; paintPill();
-  toast(lesson.is_open?'השיעור פתוח לתלמידים ✅':'השיעור נסגר 🔒');
+  toast(lesson.is_open?'השיעור פתוח לתלמידים':'השיעור נסגר');
 };
 $('l-new').onclick=async()=>{
   const title=prompt('שם השיעור החדש:','שיעור חדש'); if(title===null)return;
@@ -322,18 +411,18 @@ $('l-new').onclick=async()=>{
   await db.from('shoshi_lessons').update({is_open:false}).eq('id',lesson.id); // סוגר את הקודם
   let {data,error}=await db.from('shoshi_lessons').insert(copy).select().single();
   if(error&&/column|schema/i.test(error.message)){
-    const {min_answers,card_bg,card_text,...old}=copy;
+    const {min_answers,card_bg,card_text,images_on,...old}=copy;
     ({data,error}=await db.from('shoshi_lessons').insert(old).select().single());
   }
   if(error)return toast('שגיאה: '+error.message);
   lesson=data; await loadLesson(); await loadLessonList();
-  toast('שיעור חדש נפתח! 🎉');
+  toast('שיעור חדש נפתח');
 };
 
 /* ---- תגובות ---- */
 async function loadLessonList(){
   const {data}=await db.from('shoshi_lessons').select('id,title,created_at').order('created_at',{ascending:false});
-  $('r-lesson').innerHTML=(data||[]).map(l=>`<option value="${l.id}">${l.title} · ${new Date(l.created_at).toLocaleDateString('he-IL')}</option>`).join('');
+  $('r-lesson').innerHTML=(data||[]).map(l=>`<option value="${l.id}">${esc(l.title)} · ${new Date(l.created_at).toLocaleDateString('he-IL')}</option>`).join('');
   if(data?.length)loadResponses(data[0].id);
 }
 $('r-lesson').onchange=e=>loadResponses(e.target.value);
@@ -341,17 +430,63 @@ let lastResponses=[];
 async function loadResponses(lid){
   const {data}=await db.from('shoshi_responses').select('*,student:shoshi_students(photo_base64)').eq('lesson_id',lid).order('created_at',{ascending:false});
   lastResponses=data||[];
-  if(!data?.length){$('r-list').innerHTML='<p class="sub" style="margin-top:16px">עדיין אין תגובות לשיעור הזה 🌱</p>';return}
+  if(!data?.length){$('r-list').innerHTML='<p class="sub" style="margin:16px 0 0">עדיין אין תגובות לשיעור הזה</p>';return}
   $('r-list').innerHTML=data.map(r=>`
     <div class="resp">
       <div class="who">
-        ${r.student?.photo_base64?`<img src="${r.student.photo_base64}">`:`<span class="noimg">${(r.student_name||'?')[0]}</span>`}
-        <div><b>${r.student_name||'ללא שם'}</b><small>${new Date(r.created_at).toLocaleString('he-IL')}</small></div>
+        ${r.student?.photo_base64?`<img src="${r.student.photo_base64}" alt="">`:`<span class="noimg">${esc((r.student_name||'?')[0])}</span>`}
+        <div><b>${esc(r.student_name||'ללא שם')}</b><small>${new Date(r.created_at).toLocaleString('he-IL')}</small></div>
       </div>
-      ${(r.answers||[]).filter(a=>a.a||a.emoji).map(a=>`<div class="qa"><b>${a.q}</b>${a.emoji?a.emoji+' ':''}${a.a}</div>`).join('')}
-      ${r.image_url?`<img src="${r.image_url}" style="max-width:200px;border-radius:12px;margin-top:8px">`:''}
+      ${(r.answers||[]).filter(a=>a.a||a.emoji).map(a=>`<div class="qa"><b>${esc(a.q)}</b>${a.emoji?esc(a.emoji)+' ':''}${esc(a.a)}</div>`).join('')}
+      ${r.image_url?`<img class="gen" src="${esc(r.image_url)}" alt="תמונת AI של התלמיד">`:''}
+      ${imgNote(r)}
+      <button class="btn ghost small r-regen" data-id="${r.id}" style="margin-top:10px">${ic('refresh')}תמונה חדשה</button>
     </div>`).join('');
+  document.querySelectorAll('.r-regen').forEach(b=>b.onclick=async()=>{
+    if(!confirm("ליצור תמונה חדשה לתלמיד הזה? (כ-20 אג')"))return;
+    b.disabled=true; b.textContent='מכינה תמונה...';
+    const res=await genImage(b.dataset.id,{force:true,pass:String(settings?.admin_pass??'')});
+    if(res?.status==='failed')toast(imgErrText(res.error));
+    loadResponses(lid);
+  });
 }
+
+/* ---- תמונות AI ---- */
+const IMG_ERR={no_credit:'נגמר הקרדיט ב-OpenAI, צריך לטעון',blocked:'OpenAI לא אישרו את התוכן הזה',bad_key:'המפתח של OpenAI לא תקין',no_key:'המפתח של OpenAI לא מחובר',not_verified:'צריך לאמת את החשבון ב-OpenAI',daily_cap:'הגעת לתקרה של 150 תמונות ביממה',forbidden:'אין הרשאה'};
+const imgErrText=e=>IMG_ERR[String(e||'').split(':')[0]]||'תקלה זמנית, אפשר לנסות שוב';
+function imgNote(r){
+  if(r.image_status==='failed')return `<p class="sub" style="margin:8px 0 0;color:var(--danger)">התמונה לא נוצרה: ${imgErrText(r.image_error)}</p>`;
+  if(['generating','queued'].includes(r.image_status))return '<p class="sub" style="margin:8px 0 0">התמונה בהכנה...</p>';
+  return '';
+}
+// מפעיל יצירה ומחכה לתוצאה (הקריאות הבאות רק בודקות סטטוס)
+async function genImage(id,opts={}){
+  let body={response_id:id,...opts};
+  for(let i=0;i<30;i++){
+    const {data,error}=await db.functions.invoke('shoshi-image',{body});
+    if(error)return {status:'failed',error:'server'};
+    if(!['generating','queued'].includes(data?.status))return data;
+    body={response_id:id};
+    await new Promise(r=>setTimeout(r,8000));
+  }
+  return {status:'generating'};
+}
+$('r-gen').onclick=async()=>{
+  const lid=$('r-lesson').value, todo=lastResponses.filter(r=>!r.image_url);
+  if(!todo.length)return toast('לכל התלמידים בשיעור הזה כבר יש תמונה');
+  if(!confirm(`ליצור ${todo.length} תמונות? (כ-20 אג' לתמונה)`))return;
+  const st=$('r-gen-status'); st.classList.remove('hidden'); $('r-gen').disabled=true;
+  let ok=0;
+  for(let i=0;i<todo.length;i++){
+    st.textContent=`מכינה תמונה ${i+1} מתוך ${todo.length}...`;
+    const res=await genImage(todo[i].id,{retry:true});
+    if(res?.status==='done')ok++;
+    if(res?.status==='off'){toast('התמונות כבויות בשיעור הזה');break}
+    if(/^(no_credit|bad_key|no_key|not_verified|daily_cap)/.test(res?.error||'')){toast(imgErrText(res.error));break}
+  }
+  st.textContent=`נוצרו ${ok} מתוך ${todo.length} תמונות`;
+  $('r-gen').disabled=false; loadResponses(lid);
+};
 $('r-export').onclick=()=>{
   if(!lastResponses.length)return toast('אין תגובות לייצא לשיעור הזה');
   const title=$('r-lesson').selectedOptions[0]?.textContent||'שיעור';
@@ -365,7 +500,7 @@ $('r-export').onclick=()=>{
   const blob=new Blob(['﻿'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob); a.download='פידבק - '+title.replace(/[\\/:*?"<>|]/g,'-')+'.csv'; a.click();
-  toast('הקובץ ירד! 📥');
+  toast('הקובץ ירד');
 };
 
 /* ---- הקרנה ---- */
@@ -391,16 +526,16 @@ document.querySelectorAll('#proj .chip[data-m]').forEach(c=>c.onclick=()=>{
 async function renderProj(){
   const {data}=await db.from('shoshi_responses').select('*,student:shoshi_students(photo_base64)').eq('lesson_id',lesson.id).order('created_at');
   $('proj-title').textContent=lesson.title;
-  $('proj-count').textContent=(data?.length||0)+' תלמידים שיתפו 💜';
+  $('proj-count').textContent=(data?.length||0)+' תלמידים שיתפו';
   $('proj-grid').className=projMode==='names'?'names':'';
   // בקשת שושי: אף פעם לא להציג שם ליד מה שכתב — או רק שמות, או רק תשובות, או רק תמונות
   $('proj-grid').innerHTML=(data||[]).map(r=>{
-    const av=r.student?.photo_base64?`<img src="${r.student.photo_base64}">`:'';
-    if(projMode==='names')return `<div class="pcard"><div class="pname">${av}${r.student_name}</div></div>`;
-    if(projMode==='images')return r.image_url?`<div class="pcard"><img class="gen" src="${r.image_url}"></div>`:'';
+    const av=r.student?.photo_base64?`<img src="${r.student.photo_base64}" alt="">`:'';
+    if(projMode==='names')return `<div class="pcard"><div class="pname">${av}${esc(r.student_name)}</div></div>`;
+    if(projMode==='images')return r.image_url?`<div class="pcard"><img class="gen" src="${esc(r.image_url)}" alt=""></div>`:'';
     const best=(r.answers||[]).filter(a=>a.a).map(a=>(a.emoji?a.emoji+' ':'')+a.a).sort((a,b)=>b.length-a.length)[0]||'';
-    return best?`<div class="pcard"><div class="pans">"${best.length>160?best.slice(0,158)+'…':best}"</div></div>`:'';
-  }).join('')||'<p style="opacity:.6;text-align:center;grid-column:1/-1">מחכים לתגובות... ✨</p>';
+    return best?`<div class="pcard"><div class="pans">"${esc(best.length>160?best.slice(0,158)+'…':best)}"</div></div>`:'';
+  }).join('')||'<p style="opacity:.65;text-align:center;grid-column:1/-1">מחכים לתגובות...</p>';
 }
 
 /* ---- הגדרות ---- */
@@ -408,12 +543,12 @@ $('s-save').onclick=async()=>{
   const p=$('s-pass').value.trim()||'770';
   const {error}=await db.from('shoshi_settings').update({admin_pass:p}).eq('id',1);
   if(error)return toast('שגיאה: '+error.message);
-  settings.admin_pass=p; toast('נשמר! 💜');
+  settings.admin_pass=p; toast('נשמר');
 };
 async function loadStudents(){
   const {data}=await db.from('shoshi_students').select('name,created_at').order('created_at');
   $('s-students').innerHTML=data?.length
-    ? data.map(s=>s.name).join(' · ')+`<br><br>סה"כ: ${data.length} תלמידים`
+    ? data.map(s=>esc(s.name)).join(' · ')+`<br><br>סה"כ: ${data.length} תלמידים`
     : 'עדיין אין נרשמים';
 }
 
