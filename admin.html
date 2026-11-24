@@ -65,6 +65,8 @@
   .qedit .row{gap:8px}
   .qedit select{width:auto;flex:none}
   .qedit input{flex:1 1 200px;min-width:0}
+  .qedit .qe-spacer{flex:1 1 auto}
+  .qedit .qe-q{width:100%;margin-top:8px;min-height:56px;resize:vertical;overflow:hidden;line-height:1.45}
   .qedit .mini{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:8px;width:38px;height:38px;flex:none;transition:background-color .15s,color .15s}
   .qedit .mini:hover{background:var(--bg);color:var(--ink)}
   .qedit .qe-del:hover{background:var(--danger-soft);color:var(--danger)}
@@ -173,7 +175,9 @@
         <option>איור מצויר</option><option>פוסטר קולנוע</option><option>פיקסל ארט</option>
       </select>
       <label for="l-prompt">הנחיות לתמונה (הפרומפט)</label>
+      <div class="row" id="prompt-ideas" style="gap:6px;margin-bottom:8px"></div>
       <textarea id="l-prompt"></textarea>
+      <p class="hint" style="margin-top:8px">כותבים בשפה חופשית מה שרוצים לראות בתמונה. פקודות קיצור של ChatGPT (כמו <code>/billboard</code>) לא עובדות כאן ונכנסות כטקסט רגיל — אפשר ללחוץ על אחד הרעיונות למעלה והוא ייכנס לפרומפט.</p>
     </div>
 
     <div class="card">
@@ -315,11 +319,12 @@ function renderQEditor(){
           <option value="emoji"${qo.type==='emoji'?' selected':''}>בחירת אימוג'י</option>
           <option value="openers"${qo.type==='openers'?' selected':''}>פתיחים לבחירה</option>
         </select>
-        <input class="qe-q" value="${esc(qo.q)}" placeholder="נוסח השאלה" aria-label="נוסח השאלה">
+        <span class="qe-spacer"></span>
         <button class="mini qe-up" aria-label="להזיז למעלה" title="למעלה">${ic('up')}</button>
         <button class="mini qe-dn" aria-label="להזיז למטה" title="למטה">${ic('down')}</button>
         <button class="mini qe-del" aria-label="מחיקת השאלה" title="מחיקה">${ic('x')}</button>
       </div>
+      <textarea class="qe-q" rows="2" placeholder="נוסח השאלה" aria-label="נוסח השאלה">${esc(qo.q)}</textarea>
       ${qo.type==='openers'?`<textarea class="qe-opts" placeholder="שורה לכל פתיח">${esc((qo.options||[]).join('\n'))}</textarea>`:''}
       ${qo.type==='emoji'?`<p class="hint">אוטומטי: המערכת מגרילה 3 אימוג'ים חדשים בכל שיעור, התלמיד בוחר אחד ומסביר בכמה מילים</p>`:''}
     </div>`).join('');
@@ -330,13 +335,37 @@ function renderQEditor(){
       if(qList[i].type==='openers'&&!qList[i].options?.length)qList[i].options=[...DEFAULT_OPENERS];
       renderQEditor();
     };
-    el.querySelector('.qe-q').oninput=e=>qList[i].q=e.target.value;
+    const qta=el.querySelector('.qe-q');
+    const grow=t=>{t.style.height='auto';t.style.height=Math.max(56,t.scrollHeight)+'px'};
+    grow(qta);
+    qta.oninput=e=>{qList[i].q=e.target.value;grow(e.target)};
     el.querySelector('.qe-opts')?.addEventListener('input',e=>qList[i].options=e.target.value.split('\n').map(s=>s.trim()).filter(Boolean));
     el.querySelector('.qe-del').onclick=()=>{qList.splice(i,1);renderQEditor()};
     el.querySelector('.qe-up').onclick=()=>{if(i>0){[qList[i-1],qList[i]]=[qList[i],qList[i-1]];renderQEditor()}};
     el.querySelector('.qe-dn').onclick=()=>{if(i<qList.length-1){[qList[i+1],qList[i]]=[qList[i],qList[i+1]];renderQEditor()}};
   });
 }
+/* ---- רעיונות פרומפט מוכנים (במקום פקודות סלאש של ChatGPT, שלא עובדות ב-API) ---- */
+const PROMPT_IDEAS=[
+  ['שלט חוצות','התלמיד מופיע על שלט חוצות גדול ברחוב, עם משפט מפתח מהפידבק שלו ככותרת ענקית על השלט'],
+  ['כתבה בעיתון','שער עיתון עם תמונת התלמיד ככוכב הכתבה, הכותרת היא הרעיון המרכזי שהוא כתב'],
+  ['קומיקס','התלמיד בתוך ריבוע קומיקס, מביע בבועות דיבור את עיקרי מה שכתב'],
+  ['גיבור על','התלמיד כדמות גיבור-על, והכוח שלו הוא הרעיון שהוא כתב בפידבק'],
+  ['לפני ואחרי','תמונה מפוצלת לשניים: מצד אחד לפני השיעור ומצד שני אחרי, לפי מה שהתלמיד כתב שהתחדש לו'],
+  ['מסע','התלמיד בתוך נוף של מסע או דרך, כשהשלבים בדרך הם הדברים שהוא כתב'],
+];
+function renderPromptIdeas(){
+  const box=$('prompt-ideas'); if(!box)return;
+  box.innerHTML=PROMPT_IDEAS.map((x,i)=>
+    `<button type="button" class="btn ghost small" data-pi="${i}">${x[0]}</button>`).join('');
+  box.querySelectorAll('[data-pi]').forEach(b=>b.onclick=()=>{
+    const [,text]=PROMPT_IDEAS[+b.dataset.pi], ta=$('l-prompt');
+    const base=ta.value.trim();
+    ta.value = base ? base+'\n'+text : text;
+    ta.focus(); toast('הרעיון נוסף לפרומפט');
+  });
+}
+
 $('q-add').onclick=()=>{qList.push({type:'text',q:''});renderQEditor();$('q-editor').lastElementChild?.querySelector('.qe-q').focus()};
 
 /* ---- שיעור ---- */
@@ -351,6 +380,7 @@ async function loadLesson(){
   $('l-images').checked=lesson.images_on!==false;
   $('l-style').value=lesson.image_style||'קומיקס';
   $('l-prompt').value=lesson.image_prompt||'';
+  renderPromptIdeas();
   $('l-min').value=lesson.min_answers??3;
   $('l-ctext').value=lesson.card_text||'';
   const bg=lesson.card_bg||'';

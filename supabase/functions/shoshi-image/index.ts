@@ -55,7 +55,9 @@ ${answers}
 Weave the student's own ideas into the scene, the props and the background.
 
 RULES:
-- Any text in the image must be in Russian, correctly spelled and short: at most 4 short phrases, taken from the lesson point and the student's words.
+- Text: Russian only, correctly spelled. At most 4 short phrases in the WHOLE image, counting every speech bubble, sign, label and note together. Fewer is better. No writing on books, notebooks, lists or other objects.
+- This is a Jewish (Chabad) classroom. Never depict G-d as a person, face, hand, figure or superhero. Every character in the image is a human being. If the student's words speak about G-d ("Он", "Всевышний", "Б-г"), show this only through warm light from above, never through a character.
+- No symbols or buildings of other religions: no domes of mosques, no crosses, no churches. Do not draw the Jerusalem skyline or the Temple Mount. If the Western Wall (Kotel) appears, show only a close-up of its big stones with open sky above them, and no buildings, towers or domes behind it.
 - Family-friendly. Everyone wears modest clothing: long sleeves, and for women and girls a skirt below the knee.`;
 }
 

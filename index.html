@@ -152,7 +152,7 @@
       <h2>Приятно познакомиться</h2>
       <p class="sub" style="margin-bottom:0">Напиши имя один раз, и в следующий раз система узнает тебя с любого устройства</p>
       <label for="reg-name">Имя и фамилия</label>
-      <input type="text" id="reg-name" placeholder="Например: Маша Репринцева" autocomplete="name">
+      <input type="text" id="reg-name" placeholder="Например: Анна Иванова" autocomplete="name">
       <label>Твоё фото <small>(необязательно)</small></label>
       <button type="button" class="photo-drop" id="photo-drop">
         <span class="photo-slot" id="photo-slot" data-ic="camera"></span>
@@ -308,7 +308,7 @@ $('reg-btn').onclick=async()=>{
   $('reg-err').classList.add('hidden');
   if(name.length<2){regErr('Напиши своё имя');return}
   if(name.split(' ').length<2&&!/[0-9._-]/.test(name)){
-    regErr('Чтобы мы всегда узнавали тебя одинаково, напиши имя и фамилию (или имя с цифрами, например: Маша770)');return
+    regErr('Чтобы мы всегда узнавали тебя одинаково, напиши имя и фамилию (или имя с цифрами, например: Анна770)');return
   }
   $('reg-btn').disabled=true;
   // узнавание по имени — если имя уже есть, это скорее всего тот же ученик с другого устройства
@@ -330,7 +330,7 @@ $('found-yes').onclick=()=>{
 };
 $('found-no').onclick=()=>{
   regReset();
-  regErr('Похоже, кто-то с таким именем уже есть. Добавь что-то своё, например фамилию или цифры: Маша К 12');
+  regErr('Похоже, кто-то с таким именем уже есть. Добавь что-то своё, например фамилию или цифры: Анна К 12');
 };
 
 /* ---- форма ---- */
